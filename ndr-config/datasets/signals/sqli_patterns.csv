@@ -1,0 +1,20 @@
+union select
+insert into
+drop table
+xp_cmdshell
+exec master
+exec xp_
+' OR '
+1=1--
+' OR 1=1
+'; DROP
+UNION ALL SELECT
+information_schema
+CONCAT(0x
+CHAR(
+LOAD_FILE(
+INTO OUTFILE
+INTO DUMPFILE
+benchmark(
+sleep(
+waitfor delay

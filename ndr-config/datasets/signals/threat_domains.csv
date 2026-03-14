@@ -1,0 +1,7 @@
+# Threat Intelligence Domain Blacklist
+# Format: domain
+# Populate with known malicious domains from threat feeds
+# Example entries:
+evil-domain.com
+malware-c2.net
+phishing-site.xyz

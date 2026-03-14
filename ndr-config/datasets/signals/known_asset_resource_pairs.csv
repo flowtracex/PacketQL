@@ -1,0 +1,5 @@
+# Known asset-resource pairs — BASELINE-POPULATED
+# Populated by the baseline service as it learns normal access patterns
+# Format: asset_id,resource_path
+# SIG-037 fires when an asset accesses a resource NOT in this list
+# This file starts empty and grows during the baseline period

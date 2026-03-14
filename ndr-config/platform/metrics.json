@@ -1,0 +1,329 @@
+{
+  "version": "1.0.0",
+  "description": "NDR Pipeline Metrics Schema — defines what to measure at each pipeline stage. Metrics are emitted to ndr.pipeline-metrics Kafka topic.",
+  "last_updated": "2026-02-09",
+  "topic": "${TOPIC_PREFIX}.pipeline-metrics",
+
+  "stages": {
+    "go_ingest": {
+      "description": "Go pipeline: Kafka consumption from zeek.raw",
+      "component": "kafka-parquet-pipeline",
+      "metrics": {
+        "events_consumed": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Total events consumed from zeek.raw",
+          "labels": ["log_type"]
+        },
+        "consume_lag": {
+          "type": "gauge",
+          "unit": "events",
+          "description": "Consumer lag (messages behind head)",
+          "labels": ["partition"]
+        },
+        "consume_errors": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events that failed to deserialize from Kafka",
+          "labels": ["error_type"],
+          "alert_threshold": 10,
+          "alert_window_minutes": 5
+        }
+      }
+    },
+
+    "go_enrichment": {
+      "description": "Go pipeline: enrichment stage (threat intel, asset resolution, GeoIP, etc.)",
+      "component": "kafka-parquet-pipeline",
+      "metrics": {
+        "events_enriched": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events successfully enriched",
+          "labels": ["log_type"]
+        },
+        "enrichment_errors": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events where enrichment partially or fully failed",
+          "labels": ["log_type", "enrichment_component"],
+          "alert_threshold": 50,
+          "alert_window_minutes": 5
+        },
+        "enrichment_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "Time to enrich a single event (all components)",
+          "labels": ["log_type"],
+          "buckets": [1, 5, 10, 25, 50, 100, 250, 500, 1000]
+        },
+        "redis_lookup_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "Redis lookup latency per enrichment component",
+          "labels": ["component"],
+          "buckets": [0.5, 1, 2, 5, 10, 25, 50]
+        },
+        "redis_errors": {
+          "type": "counter",
+          "unit": "errors",
+          "description": "Redis connection or command errors",
+          "labels": ["component", "error_type"],
+          "alert_threshold": 5,
+          "alert_window_minutes": 1
+        },
+        "sqlite_lookup_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "SQLite (GeoIP) lookup latency",
+          "labels": [],
+          "buckets": [0.1, 0.5, 1, 2, 5, 10]
+        },
+        "events_to_dlq": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events routed to dead letter queue",
+          "labels": ["log_type", "error_type"],
+          "alert_threshold": 10,
+          "alert_window_minutes": 5
+        }
+      }
+    },
+
+    "go_output": {
+      "description": "Go pipeline: output stage (Kafka produce + Parquet write)",
+      "component": "kafka-parquet-pipeline",
+      "metrics": {
+        "events_produced": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events successfully produced to ndr.enriched",
+          "labels": ["log_type"]
+        },
+        "produce_errors": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events that failed Kafka produce",
+          "labels": ["error_type"],
+          "alert_threshold": 5,
+          "alert_window_minutes": 1
+        },
+        "produce_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "Kafka produce latency (ack round-trip)",
+          "labels": [],
+          "buckets": [1, 5, 10, 25, 50, 100, 250]
+        },
+        "parquet_rows_written": {
+          "type": "counter",
+          "unit": "rows",
+          "description": "Total rows written to Parquet files",
+          "labels": ["log_type"]
+        },
+        "parquet_files_closed": {
+          "type": "counter",
+          "unit": "files",
+          "description": "Parquet files closed and flushed to disk",
+          "labels": ["log_type"]
+        },
+        "parquet_write_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "Parquet file close/flush latency",
+          "labels": [],
+          "buckets": [10, 50, 100, 250, 500, 1000, 5000]
+        },
+        "end_to_end_latency_ms": {
+          "type": "histogram",
+          "unit": "milliseconds",
+          "description": "Total latency from Kafka consume to enriched produce (ingest_time - event_time)",
+          "labels": ["log_type"],
+          "buckets": [10, 50, 100, 250, 500, 1000, 2500, 5000]
+        }
+      }
+    },
+
+    "flink_signal": {
+      "description": "Flink SQL: signal detection stage",
+      "component": "flink-sql-engine",
+      "metrics": {
+        "events_parsed": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events successfully parsed from ndr.enriched by Flink",
+          "labels": ["log_type"]
+        },
+        "parse_errors": {
+          "type": "counter",
+          "unit": "events",
+          "description": "Events that failed JSON parsing in Flink (currently silently dropped!)",
+          "labels": [],
+          "alert_threshold": 50,
+          "alert_window_minutes": 5,
+          "note": "These are currently lost due to json.ignore-parse-errors=true. DLQ should catch these."
+        },
+        "signals_fired": {
+          "type": "counter",
+          "unit": "signals",
+          "description": "Total signals produced to ndr.signals",
+          "labels": ["signal_id", "log_type"]
+        },
+        "signal_errors": {
+          "type": "counter",
+          "unit": "errors",
+          "description": "Signal SQL execution errors",
+          "labels": ["signal_id", "error_type"]
+        },
+        "lookup_cache_hits": {
+          "type": "counter",
+          "unit": "lookups",
+          "description": "Flink lookup cache hits (baseline_tier1, baseline_tier2, ref_*)",
+          "labels": ["table_name"]
+        },
+        "lookup_cache_misses": {
+          "type": "counter",
+          "unit": "lookups",
+          "description": "Flink lookup cache misses (actual Redis/SQLite queries)",
+          "labels": ["table_name"]
+        },
+        "consumer_lag": {
+          "type": "gauge",
+          "unit": "events",
+          "description": "Flink consumer lag on ndr.enriched topic",
+          "labels": ["partition"]
+        }
+      }
+    },
+
+    "correlation": {
+      "description": "Correlation engine: multi-signal use case matching",
+      "component": "usecase-engine",
+      "metrics": {
+        "signals_received": {
+          "type": "counter",
+          "unit": "signals",
+          "description": "Signals consumed from ndr.signals",
+          "labels": ["signal_id"]
+        },
+        "use_cases_triggered": {
+          "type": "counter",
+          "unit": "alerts",
+          "description": "Use cases that reached threshold and produced alerts",
+          "labels": ["use_case_id"]
+        },
+        "alerts_produced": {
+          "type": "counter",
+          "unit": "alerts",
+          "description": "Total alerts produced to ndr.alerts",
+          "labels": ["severity"]
+        },
+        "correlation_window_active": {
+          "type": "gauge",
+          "unit": "windows",
+          "description": "Number of active correlation windows in memory",
+          "labels": ["use_case_id"]
+        }
+      }
+    }
+  },
+
+  "dashboards": {
+    "pipeline_health": {
+      "description": "Top-level pipeline health dashboard",
+      "panels": [
+        {
+          "title": "Events/sec by Stage",
+          "type": "timeseries",
+          "metrics": ["go_ingest.events_consumed", "go_enrichment.events_enriched", "go_output.events_produced", "flink_signal.events_parsed"]
+        },
+        {
+          "title": "Error Rate by Stage",
+          "type": "timeseries",
+          "metrics": ["go_ingest.consume_errors", "go_enrichment.enrichment_errors", "go_output.produce_errors", "flink_signal.parse_errors"]
+        },
+        {
+          "title": "DLQ Events",
+          "type": "stat",
+          "metrics": ["go_enrichment.events_to_dlq"],
+          "alert": true
+        },
+        {
+          "title": "End-to-End Latency (p95)",
+          "type": "gauge",
+          "metrics": ["go_output.end_to_end_latency_ms"]
+        },
+        {
+          "title": "Signals Fired",
+          "type": "timeseries",
+          "metrics": ["flink_signal.signals_fired"]
+        },
+        {
+          "title": "Alerts Produced",
+          "type": "stat",
+          "metrics": ["correlation.alerts_produced"]
+        }
+      ]
+    },
+    "enrichment_detail": {
+      "description": "Detailed enrichment pipeline metrics",
+      "panels": [
+        {
+          "title": "Redis Lookup Latency (p99)",
+          "type": "heatmap",
+          "metrics": ["go_enrichment.redis_lookup_latency_ms"]
+        },
+        {
+          "title": "GeoIP Lookup Latency",
+          "type": "timeseries",
+          "metrics": ["go_enrichment.sqlite_lookup_latency_ms"]
+        },
+        {
+          "title": "Enrichment Errors by Component",
+          "type": "timeseries",
+          "metrics": ["go_enrichment.enrichment_errors"]
+        }
+      ]
+    }
+  },
+
+  "alerting_rules": [
+    {
+      "name": "high_dlq_rate",
+      "condition": "go_enrichment.events_to_dlq > 100 in 5m",
+      "severity": "critical",
+      "description": "More than 100 events routed to DLQ in 5 minutes"
+    },
+    {
+      "name": "enrichment_error_spike",
+      "condition": "go_enrichment.enrichment_errors > 500 in 5m",
+      "severity": "high",
+      "description": "Enrichment error rate exceeds 500 events in 5 minutes"
+    },
+    {
+      "name": "flink_parse_errors",
+      "condition": "flink_signal.parse_errors > 50 in 5m",
+      "severity": "high",
+      "description": "Flink parsing errors — possible schema drift between Go and Flink"
+    },
+    {
+      "name": "pipeline_latency_high",
+      "condition": "go_output.end_to_end_latency_ms p95 > 5000",
+      "severity": "medium",
+      "description": "End-to-end pipeline latency p95 exceeds 5 seconds"
+    },
+    {
+      "name": "redis_connection_errors",
+      "condition": "go_enrichment.redis_errors > 5 in 1m",
+      "severity": "critical",
+      "description": "Redis connection failures — enrichment may be degraded"
+    },
+    {
+      "name": "kafka_produce_failures",
+      "condition": "go_output.produce_errors > 5 in 1m",
+      "severity": "critical",
+      "description": "Kafka produce failures — events may be lost"
+    }
+  ]
+}
+

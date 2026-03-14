@@ -1,0 +1,84 @@
+{
+    "_doc": "System-wide Kafka connection settings and topic registry. All projects should reference this file.",
+    "bootstrap_servers": "localhost:9092",
+    "security_protocol": "PLAINTEXT",
+    "topics": {
+        "zeek_raw": {
+            "name": "zeek-raw",
+            "description": "All raw Zeek logs — consumed by Go pipeline",
+            "producer": "zeek",
+            "consumer": "golang",
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 72
+        },
+        "ndr_enriched": {
+            "name": "zeek-normalized",
+            "description": "Fully enriched events — produced by Go pipeline, consumed by Flink SQL",
+            "producer": "golang",
+            "consumer": "flink",
+            "partitions": 24,
+            "replication_factor": 3,
+            "retention_hours": 168
+        },
+        "ndr_signals": {
+            "name": "ndr_signals",
+            "description": "Platform signal detections (multi-stage, go to correlation)",
+            "producer": "flink",
+            "consumer": "correlation-engine",
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 720
+        },
+        "ndr_user_alerts": {
+            "name": "ndr.user-alerts",
+            "description": "User signal detections (single-stage, forwarded directly)",
+            "producer": "flink",
+            "consumer": "alert-router",
+            "partitions": 6,
+            "replication_factor": 3,
+            "retention_hours": 2160
+        },
+        "ndr_alerts": {
+            "name": "ndr_alerts",
+            "description": "Final correlated alerts",
+            "producer": "correlation-engine",
+            "consumer": "dashboard",
+            "partitions": 6,
+            "replication_factor": 3,
+            "retention_hours": 2160
+        },
+        "ndr_dlq": {
+            "name": "ndr.dlq",
+            "description": "Dead letter queue — events that failed processing",
+            "producer": [
+                "go_pipeline",
+                "flink_sql_engine",
+                "correlation_engine"
+            ],
+            "consumer": "ops_dashboard",
+            "partitions": 6,
+            "replication_factor": 3,
+            "retention_hours": 720,
+            "alert_on_growth": true,
+            "alert_threshold_per_minute": 100
+        },
+        "ndr_pipeline_metrics": {
+            "name": "ndr.pipeline-metrics",
+            "description": "Structured pipeline observability metrics",
+            "producer": [
+                "go_pipeline",
+                "flink_sql_engine",
+                "correlation_engine"
+            ],
+            "consumer": [
+                "ops_dashboard",
+                "prometheus_exporter"
+            ],
+            "partitions": 6,
+            "replication_factor": 3,
+            "retention_hours": 168
+        }
+    },
+    "_note": "In production, update bootstrap_servers, security_protocol (SASL_SSL), and replication_factor (3)."
+}

@@ -1,0 +1,32 @@
+# Known external domains — BASELINE-POPULATED
+# Populated by the baseline service as it learns normal outbound traffic
+# Format: domain
+# SIG-060 fires when traffic goes to a domain NOT in this list
+# This file starts empty and grows during the baseline period
+google.com
+www.google.com
+gstatic.com
+googleapis.com
+youtube.com
+ytimg.com
+microsoft.com
+office.com
+office365.com
+live.com
+windowsupdate.com
+github.com
+githubusercontent.com
+amazonaws.com
+cloudfront.net
+apple.com
+icloud.com
+cloudflare.com
+akamai.net
+fastly.net
+slack.com
+zoom.us
+dropbox.com
+atlassian.com
+npmjs.com
+pypi.org
+pythonhosted.org

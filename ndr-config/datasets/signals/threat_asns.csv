@@ -1,0 +1,8 @@
+# Threat Intelligence ASN Blacklist
+# Format: asn_number
+# Bulletproof hosting and known malicious ASNs
+# Example entries:
+AS9009
+AS48666
+AS201011
+AS44477

@@ -1,0 +1,24 @@
+# Asset Classification Rules
+# Used by ndr-enrich Go pipeline to classify assets into peer groups.
+# Format: match_type,match_value,asset_type
+# match_type: vendor_contains | traffic_ratio | ssh_sessions
+# match_value: string to match (for vendor) or threshold (for traffic)
+# asset_type: workstation | server | docker | iot | network_device
+vendor_contains,vmware,docker
+vendor_contains,docker,docker
+vendor_contains,kubernetes,docker
+vendor_contains,container,docker
+vendor_contains,cisco,network_device
+vendor_contains,juniper,network_device
+vendor_contains,arista,network_device
+vendor_contains,palo alto,network_device
+vendor_contains,fortinet,network_device
+vendor_contains,ubiquiti,network_device
+vendor_contains,hikvision,iot
+vendor_contains,axis,iot
+vendor_contains,dahua,iot
+vendor_contains,honeywell,iot
+vendor_contains,nest,iot
+vendor_contains,ring,iot
+traffic_ratio,conn_in>conn_out*3 AND conn_in>50,server
+traffic_ratio,ssh_sessions>10 AND conn_in>conn_out,server

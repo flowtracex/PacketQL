@@ -1,0 +1,19 @@
+[Unit]
+Description=NDR Frontend (Vite)
+Documentation=https://github.com/your-org/ndr
+After=network.target ndr-api.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/tools/pcapql/ndr-frontend/gui
+EnvironmentFile=-/opt/tools/pcapql/.env
+ExecStart=/usr/bin/npm run dev -- --port 3000 --host 0.0.0.0
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ndr-frontend
+
+[Install]
+WantedBy=multi-user.target

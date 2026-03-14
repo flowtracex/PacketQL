@@ -1,0 +1,124 @@
+{
+    "_doc": "Platform-wide enumerations. Single source of truth for values used across API, frontend, and scripts. To update an enum, edit this file and re-run bootstrap scripts.",
+    "severities": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+    ],
+    "alert_statuses": [
+        "new",
+        "investigating",
+        "resolved",
+        "dismissed",
+        "suppressed"
+    ],
+    "investigation_statuses": [
+        "new",
+        "active",
+        "escalated",
+        "on-hold",
+        "closed"
+    ],
+    "verdicts": [
+        "true_positive",
+        "false_positive",
+        "benign",
+        "pending"
+    ],
+    "asset_types": [
+        "server",
+        "workstation",
+        "network_device",
+        "iot",
+        "docker",
+        "unknown"
+    ],
+    "peer_groups": [
+        "workstation",
+        "server",
+        "docker",
+        "iot",
+        "network_device"
+    ],
+    "risk_levels": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+    ],
+    "log_types": [
+        "conn",
+        "dns",
+        "http",
+        "ssl",
+        "ssh",
+        "ftp",
+        "smtp",
+        "dhcp",
+        "rdp",
+        "smb_files",
+        "smb_mapping",
+        "dce_rpc",
+        "kerberos",
+        "ntlm",
+        "sip",
+        "snmp",
+        "radius",
+        "tunnel"
+    ],
+    "signal_categories": [
+        "platform",
+        "user"
+    ],
+    "signal_methods": [
+        "threshold",
+        "anomaly",
+        "pattern",
+        "ml"
+    ],
+    "directions": [
+        "inbound",
+        "outbound",
+        "internal",
+        "external"
+    ],
+    "health_statuses": [
+        "healthy",
+        "degraded",
+        "critical",
+        "unknown"
+    ],
+    "mitre_tactics": [
+        "Initial Access",
+        "Execution",
+        "Persistence",
+        "Privilege Escalation",
+        "Defense Evasion",
+        "Credential Access",
+        "Discovery",
+        "Lateral Movement",
+        "Collection",
+        "Command and Control",
+        "Exfiltration",
+        "Impact"
+    ],
+    "reputation_scoring": {
+        "critical": {
+            "score": 100,
+            "threshold_multiplier": 0.5
+        },
+        "high": {
+            "score": 75,
+            "threshold_multiplier": 0.7
+        },
+        "medium": {
+            "score": 50,
+            "threshold_multiplier": 0.85
+        },
+        "low": {
+            "score": 25,
+            "threshold_multiplier": 1.0
+        }
+    }
+}

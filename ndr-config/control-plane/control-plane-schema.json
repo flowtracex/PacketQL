@@ -1,0 +1,51 @@
+{
+    "_doc": "Global control plane constants. Signal/UC-specific defaults live in their own JSON files.",
+    "sensitivity_modes": {
+        "aggressive": {
+            "multiplier": 1.0,
+            "label": "Maximum Detection"
+        },
+        "balanced": {
+            "multiplier": 1.3,
+            "label": "Balanced (Default)"
+        },
+        "quiet": {
+            "multiplier": 2.0,
+            "label": "Reduced Noise"
+        }
+    },
+    "engineering_min_alert_threshold": 100,
+    "critical_mode_alert_threshold": 60,
+    "severity_mapping": {
+        "critical": {
+            "min_risk": 150,
+            "color": "red"
+        },
+        "high": {
+            "min_risk": 100,
+            "color": "orange"
+        },
+        "medium": {
+            "min_risk": 60,
+            "color": "yellow"
+        }
+    },
+    "risk_decay": {
+        "points_per_interval": 20,
+        "interval_minutes": 10,
+        "floor": 0
+    },
+    "signal_points_by_method": {
+        "rule": 20,
+        "zscore": 40,
+        "hybrid": 60,
+        "ml": 80
+    },
+    "visibility_score_minimum": 20,
+    "redis_key_prefixes": {
+        "global": "ndr:global",
+        "signal": "ndr:signal",
+        "usecase": "ndr:uc",
+        "suppress": "ndr:suppress"
+    }
+}

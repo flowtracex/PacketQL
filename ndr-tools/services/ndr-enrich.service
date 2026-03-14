@@ -1,0 +1,24 @@
+[Unit]
+Description=NDR Enrichment Pipeline (Go)
+Documentation=https://github.com/your-org/ndr
+After=network.target kafka.service redis.service
+Wants=kafka.service redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/tools/pcapql/ndr-enrich
+EnvironmentFile=-/opt/tools/pcapql/.env
+ExecStart=/opt/tools/pcapql/ndr-enrich/zeek-parquet-pipeline --config /opt/tools/pcapql/ndr-enrich/config/config.json
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ndr-enrich
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=4G
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+{
+    "_doc": "System-wide data paths. Projects reference these for shared data locations.",
+    "parquet": {
+        "base_path": "/opt/ndr/data/parquet",
+        "file_prefix": "events"
+    },
+    "logs": {
+        "base_path": "/opt/ndr/data/logs"
+    },
+    "models": {
+        "base_path": "/opt/ndr/data/models"
+    },
+    "reference_data": {
+        "base_path": "/opt/ndr/ndr-flink/dataset/refdata"
+    },
+    "_note": "Projects may override specific paths in their local config (e.g., ndr-enrich uses relative ./output in dev mode)."
+}

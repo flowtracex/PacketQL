@@ -1,0 +1,76 @@
+{
+    "_doc": "Named presets for one-click configuration. Applied via control_plane_init.py or API.",
+    "presets": {
+        "poc-day0": {
+            "label": "Maximum Value (PoC Demo)",
+            "description": "Day-0 PoC configuration. Tier-1 golden signals alerting, Tier-2 in shadow, noisy signals suppressed.",
+            "global": {
+                "sensitivity": "balanced",
+                "alert_threshold": 100,
+                "critical_mode": false,
+                "asset_scope": "all"
+            },
+            "signal_overrides": {
+                "SIG-004": {
+                    "ui_threshold": 100
+                },
+                "SIG-001": {
+                    "ui_threshold": 50
+                },
+                "SIG-057": {
+                    "ui_threshold": 500
+                }
+            },
+            "suppressions": {
+                "SIG-059": {
+                    "ttl_seconds": 2592000,
+                    "reason": "Needs 30-day baseline"
+                },
+                "SIG-060": {
+                    "ttl_seconds": 2592000,
+                    "reason": "Needs 30-day baseline"
+                },
+                "SIG-026": {
+                    "ttl_seconds": 604800,
+                    "reason": "Off-hours noise, needs 7-day baseline"
+                },
+                "SIG-008": {
+                    "ttl_seconds": 604800,
+                    "reason": "East-west backup noise, needs 7-day baseline"
+                },
+                "SIG-046": {
+                    "ttl_seconds": 604800,
+                    "reason": "Internal traffic noise, needs 7-day baseline"
+                },
+                "SIG-020": {
+                    "ttl_seconds": 604800,
+                    "reason": "Large exfil noise (Dropbox/OneDrive), needs 7-day baseline"
+                }
+            }
+        },
+        "balanced-production": {
+            "label": "Balanced Production",
+            "description": "Standard production mode. Tier-1 + mature Tier-2 signals alerting, no suppressions.",
+            "global": {
+                "sensitivity": "balanced",
+                "alert_threshold": 120,
+                "critical_mode": false,
+                "asset_scope": "all"
+            },
+            "signal_overrides": {},
+            "suppressions": {}
+        },
+        "quiet-investigation": {
+            "label": "Quiet Investigation",
+            "description": "Maximum noise reduction. All signals in anomaly mode only. For tuning or environment investigation.",
+            "global": {
+                "sensitivity": "quiet",
+                "alert_threshold": 200,
+                "critical_mode": false,
+                "asset_scope": "all"
+            },
+            "signal_overrides": {},
+            "suppressions": {}
+        }
+    }
+}

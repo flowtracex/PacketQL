@@ -1,0 +1,39 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.sqlite": true,
+    "**/*.sqlite3": true,
+    "**/*.log": true,
+    "data": true,
+    "logs": true,
+    "ndr-frontend/node": true,
+    "ndr-frontend/pnpm": true,
+    "ndr-frontend/gui/node_modules": true,
+    "ndr-frontend/gui/dist": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/__pycache__": true,
+    "data": true,
+    "logs": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/__pycache__/**": true,
+    "data/**": true,
+    "logs/**": true
+  }
+}

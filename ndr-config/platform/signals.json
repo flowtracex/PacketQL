@@ -1,0 +1,144 @@
+{
+  "version": "3.0.0",
+  "description": "NDR Platform global configuration",
+
+  "signal_categories": {
+    "platform": {
+      "source": "filesystem",
+      "path": "signals/",
+      "output_topic": "ndr.signals",
+      "requires_correlation": true,
+      "reload": "deployment",
+      "description": "Engineering-defined multi-stage signals with correlation"
+    },
+    "user": {
+      "source": "database",
+      "db_url": "${USER_SIGNAL_DB_URL}",
+      "output_topic": "ndr.user-alerts",
+      "requires_correlation": false,
+      "reload": "poll",
+      "poll_interval_seconds": 30,
+      "description": "GUI-created single-stage signals, executed directly in Flink",
+      "constraints": {
+        "max_tables_per_signal": 2,
+        "max_signals_per_user": 50,
+        "allowed_input_tables": ["ndr_enriched"],
+        "forbidden_sql_keywords": ["DROP", "DELETE", "UPDATE", "CREATE", "ALTER", "TRUNCATE"],
+        "max_sql_length": 10000
+      }
+    }
+  },
+
+  "peer_group_types": {
+    "workstation": {
+      "description": "End-user workstations and laptops",
+      "classification": {
+        "asset_type": "workstation",
+        "os_family": ["windows", "macos", "linux"],
+        "vendor_hints": ["dell", "hp", "lenovo", "apple"]
+      }
+    },
+    "server": {
+      "description": "Production servers and services",
+      "classification": {
+        "asset_type": "server",
+        "roles": ["web", "database", "application", "file", "dns", "mail"],
+        "vendor_hints": ["dell", "hp", "supermicro"]
+      }
+    },
+    "docker": {
+      "description": "Docker containers and microservices",
+      "classification": {
+        "asset_type": "docker",
+        "runtime": ["docker", "containerd", "kubernetes"],
+        "vendor_hints": ["vmware", "docker", "kubernetes"]
+      }
+    },
+    "iot": {
+      "description": "IoT devices, cameras, sensors",
+      "classification": {
+        "asset_type": "iot",
+        "categories": ["camera", "sensor", "printer", "hvac"],
+        "vendor_hints": ["hikvision", "axis", "honeywell"]
+      }
+    },
+    "network_device": {
+      "description": "Routers, switches, firewalls",
+      "classification": {
+        "asset_type": "network_device",
+        "categories": ["router", "switch", "firewall", "load_balancer"],
+        "vendor_hints": ["cisco", "juniper", "arista", "palo alto", "fortinet"]
+      }
+    }
+  },
+
+  "job_groups": {
+    "zeek-core": {
+      "description": "High-volume Zeek logs: conn + dns",
+      "log_types": ["conn", "dns"],
+      "parallelism": 4
+    },
+    "zeek-protocol": {
+      "description": "Protocol-level Zeek logs: ssh, http, ssl",
+      "log_types": ["ssh", "http", "ssl"],
+      "parallelism": 2
+    }
+  },
+
+  "shadow_mode": {
+    "enabled": true,
+    "default_shadow_period_days": 7,
+    "promotion_criteria": {
+      "by_signal_type": {
+        "volumetric":  { "min_days": 3, "min_events": 50,  "min_unique_assets": 5,  "baseline_stability_threshold": 0.15 },
+        "behavioral":  { "min_days": 7, "min_events": 100, "min_unique_assets": 10, "baseline_stability_threshold": 0.20, "min_model_accuracy": 0.90 },
+        "hybrid":      { "min_days": 5, "min_events": 75,  "min_unique_assets": 8,  "baseline_stability_threshold": 0.18 },
+        "rule_based":  { "min_days": 1, "min_events": 10,  "min_unique_assets": 1 }
+      },
+      "by_severity": {
+        "critical": { "min_days": 7, "manual_review_required": true },
+        "high":     { "min_days": 5, "manual_review_required": false },
+        "medium":   { "min_days": 3, "manual_review_required": false },
+        "low":      { "min_days": 1, "manual_review_required": false }
+      }
+    },
+    "auto_demotion": {
+      "enabled": true,
+      "triggers": {
+        "high_false_positive_rate": { "threshold": 0.25, "evaluation_window_days": 7, "action": "shadow" },
+        "baseline_drift":           { "threshold": 0.50, "evaluation_window_days": 3, "action": "retrain" },
+        "low_signal_volume":        { "min_events_per_day": 5, "evaluation_window_days": 14, "action": "review" }
+      }
+    },
+    "notification": {
+      "slack_webhook": "${SLACK_WEBHOOK_URL}",
+      "email_recipients": ["security-team@example.com"],
+      "notify_on_promotion": true,
+      "notify_on_demotion": true
+    }
+  },
+
+  "severity": {
+    "levels": ["low", "medium", "high", "critical"],
+    "escalation_rules": [
+      { "condition": "threat_intel_match", "boost": 1, "description": "Destination IP/domain in threat intel" },
+      { "condition": "off_hours",          "boost": 1, "description": "Activity outside business hours" },
+      { "condition": "new_asset_lt_7d",    "boost": 1, "description": "Asset first seen less than 7 days ago" },
+      { "condition": "repeated_signal",    "boost": 1, "description": "Same signal fired 3+ times in 1 hour" }
+    ],
+    "suppression": {
+      "dedup_window_minutes": 5,
+      "max_alerts_per_asset_per_hour": 10,
+      "cooldown_after_alert_minutes": 15,
+      "suppress_known_scanners": true,
+      "suppress_whitelisted_subnets": true
+    }
+  },
+
+  "baseline_refinement": {
+    "blend_ratio_real_data": 0.7,
+    "blend_ratio_seed_data": 0.3,
+    "update_frequency": "daily",
+    "min_assets_for_refinement": 5
+  }
+}

@@ -1,0 +1,2557 @@
+{
+    "_normalized": {
+        "src_ip": {
+            "label": "Source IP",
+            "description": "Source IP address (promoted from id.orig_h)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "dst_ip": {
+            "label": "Dest IP",
+            "description": "Destination IP address (promoted from id.resp_h)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "src_port": {
+            "label": "Source Port",
+            "description": "Source port number",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "dst_port": {
+            "label": "Dest Port",
+            "description": "Destination port number",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "event_time": {
+            "label": "Timestamp",
+            "description": "Event timestamp (epoch ms)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "ftx_id": {
+            "label": "FlowTraceX ID",
+            "description": "System-generated UUID for every event (log-source agnostic)",
+            "group": "system",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "flow_id": {
+            "label": "Flow ID",
+            "description": "Unique connection identifier (Zeek UID)",
+            "group": "system",
+            "contexts": []
+        },
+        "protocol": {
+            "label": "Protocol",
+            "description": "Transport protocol",
+            "group": "system",
+            "contexts": []
+        }
+    },
+    "_enriched": {
+        "direction": {
+            "label": "Direction",
+            "description": "Traffic direction (inbound / outbound / lateral)",
+            "group": "enriched",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "src_ip_is_private": {
+            "label": "Src Private",
+            "description": "Source IP is RFC1918 private address",
+            "group": "enriched",
+            "contexts": [
+                "hunting",
+                "rules"
+            ]
+        },
+        "dst_ip_is_private": {
+            "label": "Dst Private",
+            "description": "Dest IP is RFC1918 private address",
+            "group": "enriched",
+            "contexts": [
+                "hunting",
+                "rules"
+            ]
+        },
+        "event_type": {
+            "label": "Event Type",
+            "description": "Classified event type (network_connection, dns_query...)",
+            "group": "system",
+            "contexts": []
+        },
+        "event_class": {
+            "label": "Event Class",
+            "description": "Broad event category (network, identity...)",
+            "group": "system",
+            "contexts": []
+        },
+        "event_year": {
+            "label": "Year",
+            "description": "Event year (partition key)",
+            "group": "system",
+            "contexts": []
+        },
+        "event_month": {
+            "label": "Month",
+            "description": "Event month (partition key)",
+            "group": "system",
+            "contexts": []
+        },
+        "event_day": {
+            "label": "Day",
+            "description": "Event day (partition key)",
+            "group": "system",
+            "contexts": []
+        },
+        "event_hour": {
+            "label": "Hour",
+            "description": "Event hour",
+            "group": "system",
+            "contexts": []
+        },
+        "event_weekday": {
+            "label": "Weekday",
+            "description": "Day of week (0=Sunday)",
+            "group": "system",
+            "contexts": []
+        },
+        "ingest_time": {
+            "label": "Ingest Time",
+            "description": "Pipeline ingestion timestamp",
+            "group": "system",
+            "contexts": []
+        }
+    },
+    "conn": {
+        "conn_state": {
+            "label": "State",
+            "description": "TCP state code (SF=normal, S0=no reply, REJ=rejected)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "proto": {
+            "label": "Protocol",
+            "description": "Transport protocol (tcp / udp / icmp)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "service": {
+            "label": "Service",
+            "description": "Detected application protocol",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "duration": {
+            "label": "Duration",
+            "description": "Flow length in seconds",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "orig_bytes": {
+            "label": "Sent Bytes",
+            "description": "Payload bytes from originator",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "resp_bytes": {
+            "label": "Recv Bytes",
+            "description": "Payload bytes from responder",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "history": {
+            "label": "History",
+            "description": "State history letters (S=SYN, A=ACK, F=FIN, R=RST)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "orig_pkts": {
+            "label": "Sent Pkts",
+            "description": "Packet count from originator",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "resp_pkts": {
+            "label": "Recv Pkts",
+            "description": "Packet count from responder",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "orig_ip_bytes": {
+            "label": "Sent IP Bytes",
+            "description": "IP-level bytes including headers from originator",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "resp_ip_bytes": {
+            "label": "Recv IP Bytes",
+            "description": "IP-level bytes including headers from responder",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "missed_bytes": {
+            "label": "Missed Bytes",
+            "description": "Bytes missed due to packet loss",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "local_orig": {
+            "label": "Local Src",
+            "description": "Whether source is a local address",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "local_resp": {
+            "label": "Local Dst",
+            "description": "Whether destination is a local address",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "tunnel_parents": {
+            "label": "Tunnel Parent",
+            "description": "UIDs of encapsulating tunnel connections",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "ip_proto": {
+            "label": "IP Proto Num",
+            "description": "Numeric IP protocol identifier",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "dns": {
+        "query": {
+            "label": "Query",
+            "description": "Domain name being queried",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "qtype_name": {
+            "label": "Type",
+            "description": "Record type (A, AAAA, MX, TXT...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "rcode_name": {
+            "label": "Response",
+            "description": "NOERROR=success, NXDOMAIN=not found, SERVFAIL=error",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "answers": {
+            "label": "Answers",
+            "description": "Resolved IPs or records returned",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "TTLs": {
+            "label": "TTL",
+            "description": "Time-to-live for each answer record",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "rejected": {
+            "label": "Rejected",
+            "description": "Whether the DNS query was rejected",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "trans_id": {
+            "label": "Trans ID",
+            "description": "DNS transaction identifier",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "qclass_name": {
+            "label": "Class",
+            "description": "DNS class (usually IN for internet)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "AA": {
+            "label": "Authoritative",
+            "description": "Response came from authoritative server",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "TC": {
+            "label": "Truncated",
+            "description": "Response was truncated",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "RD": {
+            "label": "Recursion Req",
+            "description": "Client requested recursive resolution",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "RA": {
+            "label": "Recursion Avail",
+            "description": "Server supports recursive resolution",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "Z": {
+            "label": "Reserved Bit",
+            "description": "Reserved DNS header bit",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "http": {
+        "method": {
+            "label": "Method",
+            "description": "HTTP verb (GET, POST, PUT...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "host": {
+            "label": "Host",
+            "description": "Target hostname from HTTP Host header",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "uri": {
+            "label": "URI",
+            "description": "Requested path and query string",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "status_code": {
+            "label": "Status",
+            "description": "HTTP response code (200=OK, 404=Not Found...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "user_agent": {
+            "label": "User Agent",
+            "description": "Client browser or tool identifier",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "referrer": {
+            "label": "Referrer",
+            "description": "URL that linked to this request",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "request_body_len": {
+            "label": "Req Size",
+            "description": "Bytes in the HTTP request body",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "response_body_len": {
+            "label": "Resp Size",
+            "description": "Bytes in the HTTP response body",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "resp_mime_types": {
+            "label": "MIME Type",
+            "description": "Content type of the response",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "username": {
+            "label": "Username",
+            "description": "HTTP basic auth username",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "password": {
+            "label": "Password",
+            "description": "HTTP basic auth password",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "version": {
+            "label": "HTTP Ver",
+            "description": "HTTP protocol version",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "status_msg": {
+            "label": "Status Msg",
+            "description": "HTTP status text phrase",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "trans_depth": {
+            "label": "Pipeline Depth",
+            "description": "Pipelined request depth",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "proxied": {
+            "label": "Proxied",
+            "description": "Headers indicating proxy usage",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "origin": {
+            "label": "Origin",
+            "description": "CORS origin header value",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "tags": {
+            "label": "Tags",
+            "description": "Internal Zeek analysis tags",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "orig_fuids": {
+            "label": "Req File UIDs",
+            "description": "File UIDs for uploaded files",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "resp_fuids": {
+            "label": "Resp File UIDs",
+            "description": "File UIDs for downloaded files",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "orig_filenames": {
+            "label": "Req Filenames",
+            "description": "Names of uploaded files",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "resp_filenames": {
+            "label": "Resp Filenames",
+            "description": "Names of downloaded files",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "orig_mime_types": {
+            "label": "Req MIME Type",
+            "description": "MIME types of uploaded content",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "info_code": {
+            "label": "Info Code",
+            "description": "Informational response code",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "info_msg": {
+            "label": "Info Msg",
+            "description": "Informational response message",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "ssl": {
+        "server_name": {
+            "label": "SNI",
+            "description": "Hostname from TLS SNI extension",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "version": {
+            "label": "TLS Ver",
+            "description": "Negotiated TLS version (TLSv1.2, TLSv1.3...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "ja3": {
+            "label": "JA3",
+            "description": "Client TLS fingerprint hash",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "ja3s": {
+            "label": "JA3S",
+            "description": "Server TLS fingerprint hash",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "validation_status": {
+            "label": "Cert Valid",
+            "description": "Certificate validation result (ok, self-signed...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "subject": {
+            "label": "Cert Subject",
+            "description": "Certificate subject field",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "issuer": {
+            "label": "Cert Issuer",
+            "description": "Certificate issuer / CA",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "established": {
+            "label": "Established",
+            "description": "TLS handshake completed successfully",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "cipher": {
+            "label": "Cipher",
+            "description": "Negotiated encryption cipher suite",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "resumed": {
+            "label": "Resumed",
+            "description": "Prior TLS session was reused",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "curve": {
+            "label": "EC Curve",
+            "description": "Elliptic curve used in key exchange",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "next_protocol": {
+            "label": "ALPN",
+            "description": "Application protocol via ALPN negotiation",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "last_alert": {
+            "label": "Last Alert",
+            "description": "Last TLS alert message sent",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "ssl_history": {
+            "label": "TLS History",
+            "description": "TLS handshake state history",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "cert_chain_fuids": {
+            "label": "Cert Chain UIDs",
+            "description": "File UIDs for server certificate chain",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_cert_chain_fuids": {
+            "label": "Client Cert UIDs",
+            "description": "File UIDs for client certificate chain",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_subject": {
+            "label": "Client Cert Subject",
+            "description": "Subject of client certificate",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_issuer": {
+            "label": "Client Cert Issuer",
+            "description": "Issuer of client certificate",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "ssh": {
+        "auth_success": {
+            "label": "Auth OK",
+            "description": "Whether authentication succeeded",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "auth_attempts": {
+            "label": "Auth Tries",
+            "description": "Number of authentication attempts",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "direction": {
+            "label": "Direction",
+            "description": "Inbound or outbound SSH session",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "client": {
+            "label": "Client Ver",
+            "description": "SSH client software version string",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "server": {
+            "label": "Server Ver",
+            "description": "SSH server software version string",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "version": {
+            "label": "SSH Ver",
+            "description": "SSH protocol version (1 or 2)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "cipher_alg": {
+            "label": "Cipher",
+            "description": "Encryption algorithm negotiated",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "kex_alg": {
+            "label": "Key Exchange",
+            "description": "Key exchange algorithm used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "mac_alg": {
+            "label": "MAC Alg",
+            "description": "MAC/integrity algorithm used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "compression_alg": {
+            "label": "Compression",
+            "description": "Compression algorithm negotiated",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "host_key_alg": {
+            "label": "Host Key Alg",
+            "description": "Host key algorithm used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "host_key": {
+            "label": "Host Key",
+            "description": "Server host key fingerprint",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "ftp": {
+        "user": {
+            "label": "Username",
+            "description": "FTP login username",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "command": {
+            "label": "Command",
+            "description": "FTP command issued (RETR, STOR, LIST...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "arg": {
+            "label": "Argument",
+            "description": "Argument passed with the FTP command",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "reply_code": {
+            "label": "Reply Code",
+            "description": "FTP server reply code (220=ready, 530=auth fail...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "file_size": {
+            "label": "File Size",
+            "description": "Size of the transferred file in bytes",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "mime_type": {
+            "label": "MIME Type",
+            "description": "Detected MIME type of transferred file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "reply_msg": {
+            "label": "Reply Msg",
+            "description": "FTP server reply message text",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "password": {
+            "label": "Password",
+            "description": "FTP login password (cleartext)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "data_channel.passive": {
+            "label": "Passive Mode",
+            "description": "Whether passive data channel was used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "data_channel.orig_h": {
+            "label": "Data Src IP",
+            "description": "Originator IP of the data channel",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "data_channel.resp_h": {
+            "label": "Data Dst IP",
+            "description": "Responder IP of the data channel",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "data_channel.resp_p": {
+            "label": "Data Dst Port",
+            "description": "Responder port of the data channel",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "fuid": {
+            "label": "File UID",
+            "description": "Zeek file UID for the transferred file",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "smtp": {
+        "from": {
+            "label": "From",
+            "description": "Sender email address from message header",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "to": {
+            "label": "To",
+            "description": "Recipient email address(es)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "subject": {
+            "label": "Subject",
+            "description": "Email subject line",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "mailfrom": {
+            "label": "Mail From",
+            "description": "Envelope sender (MAIL FROM command)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "rcptto": {
+            "label": "Rcpt To",
+            "description": "Envelope recipient (RCPT TO command)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "tls": {
+            "label": "TLS",
+            "description": "Whether STARTTLS was used",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "user_agent": {
+            "label": "Mailer",
+            "description": "Email client / mailer user agent",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "x_originating_ip": {
+            "label": "Orig IP",
+            "description": "X-Originating-IP header (sender's real IP)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "last_reply": {
+            "label": "Last Reply",
+            "description": "Last SMTP server reply message",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "helo": {
+            "label": "HELO",
+            "description": "HELO/EHLO hostname sent by client",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "cc": {
+            "label": "CC",
+            "description": "CC email address(es)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "reply_to": {
+            "label": "Reply-To",
+            "description": "Reply-To address in message header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "msg_id": {
+            "label": "Message ID",
+            "description": "Unique message identifier",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "in_reply_to": {
+            "label": "In Reply To",
+            "description": "Message ID this email replies to",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "date": {
+            "label": "Date Header",
+            "description": "Date field from email header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "path": {
+            "label": "Relay Path",
+            "description": "SMTP relay hop path",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "first_received": {
+            "label": "1st Received",
+            "description": "First Received header hop",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "second_received": {
+            "label": "2nd Received",
+            "description": "Second Received header hop",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "trans_depth": {
+            "label": "Trans Depth",
+            "description": "Message depth in SMTP transaction",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "fuids": {
+            "label": "Attachment UIDs",
+            "description": "File UIDs for email attachments",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "is_webmail": {
+            "label": "Webmail",
+            "description": "Whether session appears to be webmail",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "dhcp": {
+        "assigned_addr": {
+            "label": "Assigned IP",
+            "description": "IP address assigned by DHCP server",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "mac": {
+            "label": "MAC",
+            "description": "Client MAC address",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "host_name": {
+            "label": "Hostname",
+            "description": "Hostname submitted by DHCP client",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "msg_types": {
+            "label": "Msg Types",
+            "description": "DHCP message types in session (DISCOVER, OFFER, REQUEST, ACK...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "domain": {
+            "label": "Domain",
+            "description": "Domain name provided by DHCP server",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "requested_addr": {
+            "label": "Requested IP",
+            "description": "IP address requested by client",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "lease_time": {
+            "label": "Lease Time",
+            "description": "IP lease duration in seconds",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_fqdn": {
+            "label": "Client FQDN",
+            "description": "Fully qualified domain name from client",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_message": {
+            "label": "Client Msg",
+            "description": "Message string from DHCP client",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "server_message": {
+            "label": "Server Msg",
+            "description": "Message string from DHCP server",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "duration": {
+            "label": "Duration",
+            "description": "DHCP transaction duration in seconds",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "server_addr": {
+            "label": "Server IP",
+            "description": "DHCP server IP address",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_addr": {
+            "label": "Client IP",
+            "description": "DHCP client IP address",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "uids": {
+            "label": "Conn UIDs",
+            "description": "Connection UIDs associated with this lease",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "rdp": {
+        "cookie": {
+            "label": "Cookie",
+            "description": "RDP cookie (often contains username)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "result": {
+            "label": "Result",
+            "description": "RDP negotiation result",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "security_protocol": {
+            "label": "Security",
+            "description": "Security protocol used (TLS, CredSSP, RDP...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "client_name": {
+            "label": "Client Name",
+            "description": "RDP client hostname",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "encryption_level": {
+            "label": "Enc Level",
+            "description": "RDP encryption level",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "encryption_method": {
+            "label": "Enc Method",
+            "description": "RDP encryption method",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "cert_type": {
+            "label": "Cert Type",
+            "description": "Type of certificate used in RDP session",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "cert_count": {
+            "label": "Cert Count",
+            "description": "Number of certificates seen",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "cert_permanent": {
+            "label": "Cert Permanent",
+            "description": "Whether the certificate is permanent",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "keyboard_layout": {
+            "label": "Keyboard",
+            "description": "Client keyboard layout identifier",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_build": {
+            "label": "Client Build",
+            "description": "RDP client build version number",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_dig_product_id": {
+            "label": "Product ID",
+            "description": "Client digital product ID",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "desktop_width": {
+            "label": "Width",
+            "description": "Requested desktop width in pixels",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "desktop_height": {
+            "label": "Height",
+            "description": "Requested desktop height in pixels",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "requested_color_depth": {
+            "label": "Color Depth",
+            "description": "Requested color depth for the session",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "smb_files": {
+        "action": {
+            "label": "Action",
+            "description": "SMB file action (SMB::FILE_OPEN, FILE_WRITE, FILE_DELETE...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "path": {
+            "label": "Share Path",
+            "description": "SMB share path accessed",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "name": {
+            "label": "Filename",
+            "description": "Name of the file accessed",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "size": {
+            "label": "File Size",
+            "description": "Size of the file in bytes",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "prev_name": {
+            "label": "Prev Name",
+            "description": "Previous filename before rename",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "times.modified": {
+            "label": "Modified",
+            "description": "File last modified timestamp",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "times.accessed": {
+            "label": "Accessed",
+            "description": "File last accessed timestamp",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "times.created": {
+            "label": "Created",
+            "description": "File creation timestamp",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "times.changed": {
+            "label": "Changed",
+            "description": "File metadata last changed timestamp",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "fuid": {
+            "label": "File UID",
+            "description": "Zeek file UID for this file",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "smb_mapping": {
+        "path": {
+            "label": "Share Path",
+            "description": "UNC path of the mapped SMB share",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "service": {
+            "label": "Service",
+            "description": "Service type (DISK, PRINTER, IPC...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "share_type": {
+            "label": "Share Type",
+            "description": "SMB share type (DISK, PRINTER, PIPE)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "native_file_system": {
+            "label": "Filesystem",
+            "description": "Native filesystem of the share (NTFS, FAT...)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "dce_rpc": {
+        "endpoint": {
+            "label": "Endpoint",
+            "description": "RPC endpoint interface name",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "operation": {
+            "label": "Operation",
+            "description": "RPC operation / function called",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "named_pipe": {
+            "label": "Named Pipe",
+            "description": "Named pipe used for RPC transport",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "rtt": {
+            "label": "RTT",
+            "description": "Round-trip time for the RPC call",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "kerberos": {
+        "request_type": {
+            "label": "Request",
+            "description": "Kerberos request type (AS-REQ, TGS-REQ...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "client": {
+            "label": "Client",
+            "description": "Kerberos client principal name",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "service": {
+            "label": "Service",
+            "description": "Target service principal name (SPN)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "success": {
+            "label": "Success",
+            "description": "Whether the Kerberos request succeeded",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "error_msg": {
+            "label": "Error",
+            "description": "Kerberos error message if failed",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "cipher": {
+            "label": "Cipher",
+            "description": "Encryption type used (RC4, AES256...)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "forwardable": {
+            "label": "Forwardable",
+            "description": "Ticket is forwardable",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "renewable": {
+            "label": "Renewable",
+            "description": "Ticket is renewable",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "from": {
+            "label": "Valid From",
+            "description": "Ticket validity start time",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "till": {
+            "label": "Valid Till",
+            "description": "Ticket expiry time",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_cert_subject": {
+            "label": "Client Cert",
+            "description": "Subject of client certificate used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "server_cert_subject": {
+            "label": "Server Cert",
+            "description": "Subject of server certificate used",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "client_cert_fuid": {
+            "label": "Client Cert UID",
+            "description": "File UID for client certificate",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "server_cert_fuid": {
+            "label": "Server Cert UID",
+            "description": "File UID for server certificate",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "ntlm": {
+        "username": {
+            "label": "Username",
+            "description": "NTLM authentication username",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "domainname": {
+            "label": "Domain",
+            "description": "Domain name in NTLM authentication",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "hostname": {
+            "label": "Workstation",
+            "description": "Client workstation hostname",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "success": {
+            "label": "Success",
+            "description": "Whether NTLM authentication succeeded",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "server_nb_computer_name": {
+            "label": "Server NetBIOS",
+            "description": "Server NetBIOS computer name",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "server_dns_computer_name": {
+            "label": "Server DNS",
+            "description": "Server DNS computer name",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "server_tree_name": {
+            "label": "Server Tree",
+            "description": "Server Active Directory tree name",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "sip": {
+        "method": {
+            "label": "Method",
+            "description": "SIP method (INVITE, REGISTER, BYE...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "uri": {
+            "label": "URI",
+            "description": "SIP request URI",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "status_code": {
+            "label": "Status",
+            "description": "SIP response code (200=OK, 401=Unauth...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "user_agent": {
+            "label": "User Agent",
+            "description": "SIP client user agent string",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "request_from": {
+            "label": "From",
+            "description": "SIP From header (caller)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "request_to": {
+            "label": "To",
+            "description": "SIP To header (callee)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "call_id": {
+            "label": "Call ID",
+            "description": "Unique SIP call identifier",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "subject": {
+            "label": "Subject",
+            "description": "SIP Subject header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "status_msg": {
+            "label": "Status Msg",
+            "description": "SIP response status message text",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "trans_depth": {
+            "label": "Trans Depth",
+            "description": "SIP transaction depth",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "seq": {
+            "label": "CSeq",
+            "description": "SIP CSeq header sequence number",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "date": {
+            "label": "Date",
+            "description": "SIP Date header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "reply_to": {
+            "label": "Reply-To",
+            "description": "SIP Reply-To header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "response_from": {
+            "label": "Resp From",
+            "description": "SIP From header in response",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "response_to": {
+            "label": "Resp To",
+            "description": "SIP To header in response",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "request_path": {
+            "label": "Req Via",
+            "description": "Via headers in the request",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "response_path": {
+            "label": "Resp Via",
+            "description": "Via headers in the response",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "warning": {
+            "label": "Warning",
+            "description": "SIP Warning header",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "request_body_len": {
+            "label": "Req Body Size",
+            "description": "SIP request body length",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "response_body_len": {
+            "label": "Resp Body Size",
+            "description": "SIP response body length",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "content_type": {
+            "label": "Content Type",
+            "description": "SIP body content type (e.g., application/sdp)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "snmp": {
+        "version": {
+            "label": "Version",
+            "description": "SNMP protocol version (1, 2c, 3)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "community": {
+            "label": "Community",
+            "description": "SNMP community string (password for v1/v2c)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "get_requests": {
+            "label": "GET Reqs",
+            "description": "Number of SNMP GET requests",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "set_requests": {
+            "label": "SET Reqs",
+            "description": "Number of SNMP SET requests (write ops)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "get_responses": {
+            "label": "GET Resps",
+            "description": "Number of SNMP GET responses",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "get_bulk_requests": {
+            "label": "BULK Reqs",
+            "description": "Number of SNMP GET-BULK requests",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "display_string": {
+            "label": "Display String",
+            "description": "Printable string from SNMP response",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "duration": {
+            "label": "Duration",
+            "description": "SNMP session duration in seconds",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "up_since": {
+            "label": "Up Since",
+            "description": "Timestamp when the device was last rebooted",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "radius": {
+        "username": {
+            "label": "Username",
+            "description": "RADIUS authentication username",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "result": {
+            "label": "Result",
+            "description": "Authentication result (Accept / Reject)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "mac": {
+            "label": "MAC",
+            "description": "Client MAC address",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "framed_addr": {
+            "label": "Framed IP",
+            "description": "IP address assigned to client after auth",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "connect_info": {
+            "label": "Connect Info",
+            "description": "Connection speed or access point info",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "reply_msg": {
+            "label": "Reply Msg",
+            "description": "Message from RADIUS server",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "tunnel_client": {
+            "label": "Tunnel Client",
+            "description": "Tunnel client endpoint info",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "ttl": {
+            "label": "TTL",
+            "description": "Time-to-live for the RADIUS session",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "tunnel": {
+        "tunnel_type": {
+            "label": "Tunnel Type",
+            "description": "Encapsulation type (GRE, IP-in-IP, Teredo...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "action": {
+            "label": "Action",
+            "description": "Tunnel action (TUNNEL_DISCOVER, TUNNEL_CLOSE...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        }
+    },
+    "files": {
+        "mime_type": {
+            "label": "MIME Type",
+            "description": "MIME type of the transferred file",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "filename": {
+            "label": "Filename",
+            "description": "Name of the transferred file (if available)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "source": {
+            "label": "Source",
+            "description": "Zeek analyzer that identified the file (HTTP, FTP, SMB...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "seen_bytes": {
+            "label": "Seen Bytes",
+            "description": "Number of bytes actually observed",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "total_bytes": {
+            "label": "Total Bytes",
+            "description": "Total expected file size",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "md5": {
+            "label": "MD5",
+            "description": "MD5 hash of the file",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "sha1": {
+            "label": "SHA1",
+            "description": "SHA1 hash of the file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "sha256": {
+            "label": "SHA256",
+            "description": "SHA256 hash of the file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "fuid": {
+            "label": "File UID",
+            "description": "Unique file identifier assigned by Zeek",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "tx_hosts": {
+            "label": "Sender IPs",
+            "description": "IP addresses that sent (originated) the file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "rx_hosts": {
+            "label": "Receiver IPs",
+            "description": "IP addresses that received the file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "conn_uids": {
+            "label": "Conn UIDs",
+            "description": "Connection UIDs associated with the file transfer",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "depth": {
+            "label": "Depth",
+            "description": "Nesting depth of the file (e.g. archive within archive)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "analyzers": {
+            "label": "Analyzers",
+            "description": "Zeek analyzers applied to the file",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "duration": {
+            "label": "Duration",
+            "description": "Transfer duration in seconds",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "is_orig": {
+            "label": "From Orig",
+            "description": "Whether the file came from the originator",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "local_orig": {
+            "label": "Local Orig",
+            "description": "Whether the originator is local",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "missing_bytes": {
+            "label": "Missing Bytes",
+            "description": "Bytes missing due to packet loss",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "overflow_bytes": {
+            "label": "Overflow Bytes",
+            "description": "Bytes beyond the expected total",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "timedout": {
+            "label": "Timed Out",
+            "description": "Whether the file analysis timed out",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "parent_fuid": {
+            "label": "Parent File UID",
+            "description": "UID of the parent file (for extracted/nested files)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "extracted": {
+            "label": "Extracted Path",
+            "description": "Local path where extracted file was saved",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "extracted_cutoff": {
+            "label": "Extraction Cut",
+            "description": "Whether file extraction was cut short",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "extracted_size": {
+            "label": "Extracted Size",
+            "description": "Size of the extracted file in bytes",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    },
+    "weird": {
+        "name": {
+            "label": "Weird Name",
+            "description": "Name/type of the protocol anomaly detected",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "addl": {
+            "label": "Additional Info",
+            "description": "Additional details about the anomaly",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "notice": {
+            "label": "Notice",
+            "description": "Whether this weird triggered a Zeek notice",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "peer": {
+            "label": "Peer",
+            "description": "Peer that generated this weird (for cluster setups)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "source": {
+            "label": "Source",
+            "description": "Source of the weird (protocol analyzer name)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        }
+    },
+    "dpd": {
+        "analyzer": {
+            "label": "Analyzer",
+            "description": "Zeek protocol analyzer that detected the mismatch",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "failure_reason": {
+            "label": "Failure Reason",
+            "description": "Why the protocol detection failed",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        }
+    },
+    "notice": {
+        "note": {
+            "label": "Notice Type",
+            "description": "Zeek notice type (SSL::Invalid_Server_Cert, Scan::Port_Scan...)",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "msg": {
+            "label": "Message",
+            "description": "Human-readable notice message",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "rules",
+                "logs"
+            ]
+        },
+        "sub": {
+            "label": "Sub-Message",
+            "description": "Additional context or sub-message for the notice",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "src": {
+            "label": "Notice Src",
+            "description": "Source address associated with the notice",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "dst": {
+            "label": "Notice Dst",
+            "description": "Destination address associated with the notice",
+            "group": "most_used",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "actions": {
+            "label": "Actions",
+            "description": "Actions taken (Notice::ACTION_LOG, Notice::ACTION_EMAIL...)",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "fuid": {
+            "label": "File UID",
+            "description": "File UID associated with the notice",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "file_mime_type": {
+            "label": "File MIME",
+            "description": "MIME type of associated file",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "file_desc": {
+            "label": "File Desc",
+            "description": "Description of associated file",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "p": {
+            "label": "Port",
+            "description": "Port number associated with the notice",
+            "group": "others",
+            "contexts": [
+                "hunting",
+                "logs"
+            ]
+        },
+        "n": {
+            "label": "Count",
+            "description": "Numeric value associated with the notice",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "peer_descr": {
+            "label": "Peer Desc",
+            "description": "Description of the peer that raised the notice",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        },
+        "suppress_for": {
+            "label": "Suppress Duration",
+            "description": "How long to suppress duplicate notices (seconds)",
+            "group": "others",
+            "contexts": [
+                "raw"
+            ]
+        }
+    }0
+}

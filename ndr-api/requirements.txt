@@ -1,0 +1,7 @@
+django>=5.0
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+django-filter
+redis
+duckdb

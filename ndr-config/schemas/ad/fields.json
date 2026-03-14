@@ -1,0 +1,7 @@
+{
+    "_comment": "Placeholder — Active Directory log schema (future)",
+    "ad_logon": {
+        "log_type": "logon",
+        "fields": {}
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "parquet": {
+        "lookback_hours": 24
+    },
+    "models": {
+        "path": "models/isolation-forest"
+    },
+    "schedule": {
+        "asset_summary_minutes": 15,
+        "top_queries_minutes": 30,
+        "baselines_cron": "0 0 * * *",
+        "cleanup_cron": "0 2 * * *"
+    }
+}

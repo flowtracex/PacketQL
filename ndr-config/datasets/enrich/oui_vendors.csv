@@ -1,0 +1,34 @@
+# OUI Vendor Seed Data
+# Fallback OUI → vendor mapping for offline use.
+# Full OUI database is downloaded from IEEE by ndr-baseline datasets loader.
+# Format: oui_prefix,vendor_name
+00:50:56,VMware
+00:0C:29,VMware
+00:05:69,VMware
+02:42:AC,Docker
+00:15:5D,Microsoft Hyper-V
+00:00:0C,Cisco
+00:1B:2A,Cisco
+00:26:0B,Cisco
+00:17:0F,Cisco
+00:1A:A1,Cisco
+00:22:BD,Cisco
+00:1B:C5,Juniper
+00:05:85,Juniper
+00:12:1E,Juniper
+C4:64:13,Cisco Meraki
+00:18:0A,Arista
+28:99:3A,Arista
+00:1B:17,Palo Alto
+00:86:9C,Palo Alto
+00:09:0F,Fortinet
+70:4C:A5,Fortinet
+24:5A:4C,Ubiquiti
+78:8A:20,Ubiquiti
+44:D9:E7,Ubiquiti
+54:AF:97,Hikvision
+C0:56:E3,Hikvision
+00:40:8C,Axis
+B8:A4:4F,Axis
+00:1E:C0,Honeywell
+18:B4:30,Nest

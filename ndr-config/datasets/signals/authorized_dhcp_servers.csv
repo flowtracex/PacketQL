@@ -1,0 +1,6 @@
+# Authorized DHCP servers — CUSTOMER-SPECIFIC
+# Populate with your environment's legitimate DHCP server IPs
+# Any DHCP OFFER from an IP NOT in this list triggers SIG-121
+# Example entries (replace with actual):
+192.168.1.1
+10.0.0.1

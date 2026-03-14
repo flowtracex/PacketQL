@@ -1,0 +1,48 @@
+{
+    "_doc": "ndr-enrich pipeline configuration. Values sourced from ndr-config/infra/.",
+    "kafka": {
+        "brokers": [
+            "localhost:9092"
+        ],
+        "topic": "zeek-raw",
+        "group_id": "ndr-enrich",
+        "max_poll_records": 500
+    },
+    "output": {
+        "parquet": {
+            "enabled": true,
+            "base_path": "/opt/tools/pcapql/data/parquet",
+            "file_prefix": "events"
+        },
+        "kafka": {
+            "enabled": true,
+            "brokers": [
+                "localhost:9092"
+            ],
+            "topic": "zeek-normalized",
+            "compression": "none"
+        }
+    },
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "password": "",
+        "database": 0,
+        "pool_size": 10
+    },
+    "asset_profiler": {
+        "enabled": true,
+        "sync_interval_seconds": 60,
+        "max_profiles_in_memory": 10000
+    },
+    "normalization_path": "/opt/tools/pcapql/ndr-config/schemas/zeek/normalization.json",
+    "classification_rules_path": "/opt/tools/pcapql/ndr-config/datasets/enrich/asset_classification.csv",
+    "write": {
+        "flush_buffer_mb": 16,
+        "flush_interval_seconds": 30,
+        "flush_event_count": 10000
+    },
+    "log": {
+        "path": "/opt/tools/pcapql/logs/ndr-enrich.log"
+    }
+}

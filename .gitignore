@@ -1,0 +1,68 @@
+# === Global ignores for /opt/tools/pcapql ===
+
+# Git
+.git
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+**/.venv/
+**/venv/
+
+# Node
+**/node_modules/
+**/.pnpm-store/
+**/dist/
+**/build/
+
+# Go / binaries / temp
+**/*.test
+**/*.out
+**/*.pid
+**/*.tmp
+**/*.temp
+**/*.bak
+**/*~
+**/*.swp
+**/*.swo
+
+# Local runtimes and generated artifacts
+/ndr-frontend/node/
+/ndr-frontend/pnpm/
+/ndr-frontend/gui/dist/
+/ndr-frontend/gui/node_modules/
+/ndr-frontend/gui/.env.local
+/data/
+/logs/
+**/log/
+**/output/
+**/*.log
+
+# Databases
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/db.sqlite3
+**/db.sqlite3-shm
+**/db.sqlite3-wal
+
+# Local compiled binaries
+/ndr-enrich/main
+/ndr-enrich/zeek-parquet-pipeline
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+/.vscode/*
+!/.vscode/settings.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db

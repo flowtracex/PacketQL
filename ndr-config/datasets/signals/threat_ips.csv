@@ -1,0 +1,8 @@
+# Threat Intelligence IP Blacklist
+# Format: ip_address
+# Populate with known malicious IPs from threat feeds
+# Example entries:
+185.220.101.1
+185.220.101.2
+45.154.255.147
+194.26.29.65

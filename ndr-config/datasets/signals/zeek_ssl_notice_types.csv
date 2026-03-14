@@ -1,0 +1,11 @@
+SSL::Invalid_Server_Cert
+SSL::Invalid_Ocsp_Response
+SSL::Weak_Key
+SSL::Old_Version
+SSL::Weak_Cipher
+SSL::Expired_Cert
+SSL::Certificate_Expired
+SSL::Certificate_Not_Valid_Yet
+SSL::Self_Signed_Cert
+SSL::Log_Too_Little_Data
+SSL::Not_All_Offered_Ciphersuites_Parsed

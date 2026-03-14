@@ -1,0 +1,14 @@
+# Known Scanner IPs
+# Format: ip_address,scanner_name,description
+# Used by ndr-baseline loader → Redis → ndr-enrich for scanner suppression
+71.6.135.131,BinaryEdge,BinaryEdge Internet Scanner
+71.6.146.185,Shodan,Shodan Internet Scanner
+71.6.146.186,Shodan,Shodan Internet Scanner
+198.20.69.74,Shodan,Shodan Internet Scanner
+198.20.69.98,Shodan,Shodan Internet Scanner
+162.142.125.0/24,Censys,Censys Internet Scanner
+167.94.138.0/24,Censys,Censys Internet Scanner
+167.248.133.0/24,Censys,Censys Internet Scanner
+74.120.14.0/24,Censys,Censys Internet Scanner
+193.163.125.0/24,Stretchoid,Stretchoid Internet Scanner
+205.210.31.0/24,Rapid7,Project Sonar

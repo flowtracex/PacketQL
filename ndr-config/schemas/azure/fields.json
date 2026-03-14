@@ -1,0 +1,7 @@
+{
+    "_comment": "Placeholder — Azure/M365 log schema (future)",
+    "azure_signin": {
+        "log_type": "signin",
+        "fields": {}
+    }
+}

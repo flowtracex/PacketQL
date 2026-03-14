@@ -35,5 +35,7 @@
     "**/__pycache__/**": true,
     "data/**": true,
     "logs/**": true
-  }
+  },
+  "git.autoRepositoryDetection": "openEditors",
+  "git.openRepositoryInParentFolders": "never"
 }

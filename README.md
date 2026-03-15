@@ -72,23 +72,23 @@ More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 Upload `.pcap` and `.pcapng` files, then move directly into investigation workflows.
 
-![PCAP Upload](docs/screenshots/pcap-upload.png)
+<img src="docs/screenshots/pcap-upload.png" alt="PCAP Upload" width="1100" />
 
 ### Log Search
 
 Search normalized protocol data and pivot through investigation results.
 
-![Log Search](docs/screenshots/log-search.png)
+<a href="docs/screenshots/log-search.png">
+  <img src="docs/screenshots/log-search-focus.png" alt="Log Search" width="1100" />
+</a>
 
 ### SQL Query
 
 Run SQL against structured protocol tables and inspect results in the same workflow.
 
-![SQL Query Results](docs/screenshots/sql-query-results.png)
+<img src="docs/screenshots/sql-query-results.png" alt="SQL Query Results" width="1100" />
 
 ## Quick Start With Docker Hub
-
-After you publish the image, make this the main install path.
 
 ```bash
 docker pull jobish/packetql:beta

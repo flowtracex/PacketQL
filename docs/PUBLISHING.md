@@ -1,6 +1,6 @@
 # Publishing Guide
 
-Use this page when publishing PCAPQL to GitHub and Docker Hub.
+Use this page when publishing PacketQL to GitHub and Docker Hub.
 
 ## Recommended Positioning
 
@@ -51,7 +51,7 @@ Single-container SOC PCAP investigation platform powered by Zeek, Kafka, Parquet
 ## Docker Hub Full Description
 
 ```text
-PCAPQL is an open-source SOC packet investigation platform that turns uploaded PCAP files into SQL-queryable security data.
+PacketQL is an open-source packet investigation platform that turns uploaded PCAP files into SQL-queryable security data.
 
 The bundled container includes Zeek, Kafka in KRaft mode, a Go normalization and enrichment pipeline, Parquet output, DuckDB-backed querying, a Django API, and a React UI.
 
@@ -69,15 +69,15 @@ Status: Public Beta
 ## Suggested GitHub Release Title
 
 ```text
-PCAPQL v0.1.0-beta - Single-container SOC PCAP investigation
+PacketQL v0.1.0-beta - Single-container packet investigation
 ```
 
 ## Suggested GitHub Release Notes
 
 ```text
-PCAPQL is now available as an open-source public beta.
+PacketQL is now available as an open-source public beta.
 
-PCAPQL turns packet captures into structured, SQL-queryable investigation data for SOC analysts.
+PacketQL turns packet captures into structured, SQL-queryable investigation data.
 
 Highlights:
 - Browser-based PCAP upload
@@ -106,7 +106,7 @@ Current status:
 Option 1:
 
 ```text
-PCAPQL is an open-source SOC packet investigation platform that turns PCAP files into SQL-queryable security data.
+PacketQL is an open-source packet investigation platform that turns PCAP files into SQL-queryable security data.
 ```
 
 Option 2:
@@ -126,7 +126,7 @@ Single-container PCAP investigation for SOC analysts, powered by Zeek, Kafka, Pa
 Use this wording publicly if you want to stay honest and safe:
 
 ```text
-PCAPQL is currently in public beta. The recommended deployment path is the bundled Docker container. The best experience today is with PCAP files below 50 MB. Larger files and production hardening are still being improved.
+PacketQL is currently in public beta. The recommended deployment path is the bundled Docker container. The best experience today is with PCAP files below 50 MB. Larger files and production hardening are still being improved.
 ```
 
 ## Recommended Docs Order On GitHub

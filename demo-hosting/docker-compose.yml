@@ -1,0 +1,25 @@
+services:
+  packetql:
+    image: ${PACKETQL_IMAGE:-packetql:single-optimized}
+    container_name: packetql-demo-app
+    restart: unless-stopped
+    environment:
+      APP_MODE: demo
+      NDR_DATA_DIR: /data
+      PARQUET_DATA_DIR: /data/parquet
+      KAFKA_BOOTSTRAP_SERVERS: 127.0.0.1:9092
+    expose:
+      - "3000"
+    volumes:
+      - ./runtime-data:/data
+
+  proxy:
+    image: nginx:alpine
+    container_name: packetql-demo-proxy
+    restart: unless-stopped
+    depends_on:
+      - packetql
+    ports:
+      - "${DEMO_PORT:-8088}:80"
+    volumes:
+      - ./nginx.demo.conf:/etc/nginx/conf.d/default.conf:ro

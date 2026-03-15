@@ -1,6 +1,6 @@
-# PCAPQL Launch Checklist (Public Repo)
+# PacketQL Launch Checklist (Public Repo)
 
-Use this checklist before announcing PCAPQL as production-ready.
+Use this checklist before announcing PacketQL as production-ready.
 
 ## Stage 1 - Public Beta (can publish now)
 

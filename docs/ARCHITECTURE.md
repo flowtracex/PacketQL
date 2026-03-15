@@ -1,6 +1,6 @@
-# PCAPQL Architecture
+# PacketQL Architecture
 
-PCAPQL is designed to make packet investigation simple for SOC analysts while keeping the runtime flow transparent.
+PacketQL is designed to make packet investigation simple for analysts while keeping the runtime flow transparent.
 
 ## Primary Goal
 
@@ -85,7 +85,7 @@ Official project:
 
 Kafka provides the streaming bus between packet parsing and downstream processing.
 
-PCAPQL currently uses Kafka in KRaft mode inside the bundled container.
+PacketQL currently uses Kafka in KRaft mode inside the bundled container.
 
 ### Go Enrichment Pipeline
 
@@ -134,7 +134,7 @@ This keeps first-time setup simple and avoids requiring users to manually instal
 
 Persistent runtime data lives outside the container in the mounted `/data` volume.
 
-This is where PCAPQL stores:
+This is where PacketQL stores:
 
 - uploaded files
 - parquet output

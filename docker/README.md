@@ -1,6 +1,6 @@
 # Docker Deployment
 
-This is the recommended way to run PCAPQL.
+This is the recommended way to run PacketQL.
 
 ## Recommended User Path
 

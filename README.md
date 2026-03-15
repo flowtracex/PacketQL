@@ -1,12 +1,12 @@
-# PCAPQL
+# PacketQL
 
-PCAPQL is an open-source SOC packet investigation platform that turns PCAP files into SQL-queryable security data.
+PacketQL is an open-source packet investigation platform that turns PCAP files into SQL-queryable security data.
 
 Status: **Public Beta**
 
 Recommended deployment: **single Docker container**
 
-## Why PCAPQL
+## Why PacketQL
 
 - Upload `.pcap` and `.pcapng` files from a browser
 - Parse traffic with Zeek in the background
@@ -117,8 +117,8 @@ Open: `http://localhost:8088`
 Use this only if you are building the Docker image yourself.
 
 ```bash
-git clone <your-repo-url> pcapql
-cd pcapql
+git clone https://github.com/flowtracex/PacketQL.git
+cd PacketQL
 ./docker/build-image.sh
 
 docker run -d \
@@ -230,4 +230,4 @@ If you want to contribute to the internals, the manual stack and source layout a
 
 ## Disclaimer
 
-PCAPQL is provided as-is for defensive security operations, research, and education.
+PacketQL is provided as-is for defensive security operations, research, and education.

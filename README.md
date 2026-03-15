@@ -20,48 +20,20 @@ Recommended deployment: **single Docker container**
 
 ## Recommended Deployment
 
-For most users, the right path is:
+Use the Docker image.
 
 1. `docker pull`
-2. mount one host data directory to `/data`
+2. mount a host directory to `/data`
 3. open the UI and upload a PCAP
 
-You do **not** need to manually install or wire together:
-
-- Zeek
-- Kafka
-- Kafka KRaft configuration
-- Zeek Kafka plugin
-- Django API
-- frontend services
-
-Those components are bundled in the Docker image for the simplest possible setup.
+PacketQL bundles the full pipeline in one container, so you do not need to set up Zeek, Kafka, plugins, the API, or the frontend separately.
 
 ## Architecture
 
-High-level flow:
+Pipeline:
 
 ```text
-PCAP Upload
-   |
-   v
-Zeek Network Security Monitor
-   |
-   v
-Kafka (KRaft)
-   |
-   v
-Go normalization + enrichment pipeline
-   |
-   +--> normalized Kafka stream
-   |
-   +--> Parquet files
-           |
-           v
-        DuckDB
-           |
-           v
-     Django API + React UI
+PCAP -> Zeek -> Kafka -> Go pipeline -> Parquet -> DuckDB -> API/UI
 ```
 
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)

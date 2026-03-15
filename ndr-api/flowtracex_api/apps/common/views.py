@@ -17,7 +17,7 @@ User = get_user_model()
 
 # Import Clients
 if settings.APP_MODE == 'production':
-    from clients.redis_client import RedisClient
+    from clients.state_store_client import StateStoreClient
     from clients.duckdb_client import DuckDBClient
 
 class GlobalSearchView(APIView):
@@ -65,15 +65,15 @@ class NotificationListView(APIView):
             serializer = NotificationSerializer(notifications, many=True)
             return Response(serializer.data)
         else:
-            # Production Mode: Redis
+            # Production mode: local state store
             key = f"notify:user:{request.user.id}:items"
-            redis_client = RedisClient.get_instance()
+            state_store = StateStoreClient.get_instance()
             # Assuming list of JSON strings
-            # redis_items = redis_client.lrange(key, offset, offset+limit-1)
-            # notifications = [json.loads(item) for item in redis_items]
+            # items = state_store.lrange(key, offset, offset+limit-1)
+            # notifications = [json.loads(item) for item in items]
             # return Response(notifications)
             
-            # Fallback to SQLite for now if Redis empty or not implemented fully
+            # Fallback to SQLite if the local state store has no items yet
             notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[offset:offset+limit]
             serializer = NotificationSerializer(notifications, many=True)
             return Response(serializer.data)
@@ -90,7 +90,7 @@ class NotificationReadView(APIView):
             except Notification.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            # Production: Update Redis and decrement count
+            # Production: update local state and decrement count later if needed
             # For now fallback to SQLite
             try:
                 notification = Notification.objects.get(pk=pk, user=request.user)

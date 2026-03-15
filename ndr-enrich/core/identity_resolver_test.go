@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-// TestIdentityResolver tests use nil Redis (pure in-memory mode)
+// TestIdentityResolver tests use nil state store (pure in-memory mode)
 
 func newTestResolver() *IdentityResolver {
 	return NewIdentityResolver(IdentityResolverConfig{
 		DefaultLeaseTTL: 3600,
-	}, nil) // nil redis = in-memory only
+	}, nil) // nil state store = in-memory only
 }
 
 func TestProcessDHCP_NewDevice(t *testing.T) {

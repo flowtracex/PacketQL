@@ -13,8 +13,8 @@ class DemoLogRepository(LogRepository):
     def search_logs(self, filters, page=1, limit=10):
         return self._prod.search_logs(filters, page, limit)
 
-    def get_analytics(self, window="24h"):
-        return self._prod.get_analytics(window=window)
+    def get_analytics(self, window="24h", source_id=None):
+        return self._prod.get_analytics(window=window, source_id=source_id)
 
     def stream_logs(self):
         """

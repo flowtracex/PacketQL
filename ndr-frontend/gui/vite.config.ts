@@ -6,6 +6,7 @@ export default defineConfig(({ mode }) => {
   // Load env from the root /opt/ndr directory where .env lives
   const envDir = path.resolve(__dirname, '../../');
   const env = loadEnv(mode, envDir, '');
+  const apiProxyTarget = env.VITE_API_PROXY_TARGET || env.VITE_API_URL || 'http://127.0.0.1:8010';
 
   return {
     server: {
@@ -13,7 +14,7 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       proxy: {
         '/api/v1': {
-          target: 'http://localhost:8000',
+          target: apiProxyTarget,
           changeOrigin: true,
           secure: false,
         }

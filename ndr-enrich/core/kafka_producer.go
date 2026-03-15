@@ -39,11 +39,11 @@ type KafkaOutputEvent struct {
 	EventType  string `json:"event_type"`  // network_connection, dns, ssh, ...
 	EventClass string `json:"event_class"` // network, authentication, application, ...
 
-	// Asset enrichment (set by Go via Redis)
+	// Asset enrichment (set by Go via the local state store)
 	AssetID   string `json:"asset_id"`
 	AssetType string `json:"asset_type"` // workstation, server, docker, iot
 
-	// Threat enrichment (set by Go via Redis)
+	// Threat enrichment (set by Go via the local state store)
 	SrcIsBlacklisted bool `json:"src_is_blacklisted"`
 	DstIsBlacklisted bool `json:"dst_is_blacklisted"`
 
@@ -110,11 +110,11 @@ func transformToKafkaOutput(event *EnrichedEvent) *KafkaOutputEvent {
 		EventType:  event.EventType,
 		EventClass: event.EventClass,
 
-		// Asset enrichment (from identity resolver via Redis)
+		// Asset enrichment (from identity resolver via the local state store)
 		AssetID:   "",
 		AssetType: "",
 
-		// Threat (TODO: populated when Redis threat lookup is integrated)
+		// Threat (TODO: populated when state store threat lookup is integrated)
 		SrcIsBlacklisted: false,
 		DstIsBlacklisted: false,
 

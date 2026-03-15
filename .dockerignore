@@ -1,0 +1,49 @@
+.git
+.gitignore
+.vscode
+.idea
+.env
+.env.*
+!.env.example
+CONTRIBUTING.md
+LICENSE
+README.md
+docs/
+
+# Runtime data/logs
+*.log
+data/
+logs/
+tmp/
+temp/
+*.tmp
+ndr-api/flowtracex_api/*.log
+ndr-api/flowtracex_api/db.sqlite3*
+ndr-api/venv/
+ndr-api/.venv/
+ndr-enrich/log/
+ndr-enrich/output/
+ndr-enrich/test/
+ndr-enrich/test_*.go
+
+# Frontend build/node cache
+ndr-frontend/gui/node_modules/
+ndr-frontend/gui/dist/
+ndr-frontend/gui/.vscode/
+ndr-frontend/node/
+ndr-frontend/pnpm/
+
+# Python caches
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+
+# Huge captures
+*.pcap
+*.pcapng
+test-pcaps/
+
+# Docker build artifacts
+docker/*.tgz
+!docker/zeek-runtime.tar.gz
+!docker/kafka_2.13-3.7.1.tgz

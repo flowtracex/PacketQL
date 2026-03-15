@@ -1,5 +1,5 @@
 from ..base.asset_repo import AssetRepository
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
 import json
 import logging
 import math
@@ -117,13 +117,13 @@ def _safe_ip(ip):
 
 def _safe_hgetall_if_hash(key):
     """
-    Read Redis hash only when key type is actually 'hash'.
+    Read state hash only when key type is actually 'hash'.
     Prevents WRONGTYPE noise from keys like ndr:assets:profile:*:ips (set).
     """
     try:
-        if RedisClient.client.type(key) != "hash":
+        if StateStoreClient.client.type(key) != "hash":
             return {}
-        return RedisClient.hgetall(key) or {}
+        return StateStoreClient.hgetall(key) or {}
     except Exception:
         return {}
 
@@ -337,23 +337,23 @@ def _get_enrich_profile_by_ip(ip):
     4. Fallback: scan ndr:asset:* (preflight seed keys) for matching ip field
     """
     # 1. DHCP chain (fast path — ndr-enrich identity resolver)
-    mac = RedisClient.get(f"ndr:assets:ip_to_mac:{ip}")
+    mac = StateStoreClient.get(f"ndr:assets:ip_to_mac:{ip}")
     if mac:
-        asset_id = RedisClient.get(f"ndr:assets:mac_to_asset:{mac}")
+        asset_id = StateStoreClient.get(f"ndr:assets:mac_to_asset:{mac}")
         if asset_id:
-            profile = RedisClient.hgetall(f"ndr:assets:profile:{asset_id}")
+            profile = StateStoreClient.hgetall(f"ndr:assets:profile:{asset_id}")
             if profile:
                 profile["_asset_id"] = asset_id
                 return profile
 
     # 2. Direct enrich key by IP
-    profile = RedisClient.hgetall(f"ndr:assets:profile:{ip}")
+    profile = StateStoreClient.hgetall(f"ndr:assets:profile:{ip}")
     if profile:
         profile["_asset_id"] = ip
         return profile
 
     # 3. Scan enrich profile keys for matching ip field
-    for key in RedisClient.scan_keys("ndr:assets:profile:*"):
+    for key in StateStoreClient.scan_keys("ndr:assets:profile:*"):
         d = _safe_hgetall_if_hash(key)
         if d and d.get("ip") == ip:
             asset_id = key.replace("ndr:assets:profile:", "")
@@ -361,7 +361,7 @@ def _get_enrich_profile_by_ip(ip):
             return d
 
     # 4. Fallback: preflight seed keys (ndr:asset:AST-PF-XX) — scan for matching ip field
-    for key in RedisClient.scan_keys("ndr:asset:*"):
+    for key in StateStoreClient.scan_keys("ndr:asset:*"):
         # Skip non-profile keys
         if any(x in key for x in [":summary:", ":top:", ":counters:", ":ip_index:", ":mac_index:", ":role:"]):
             continue
@@ -392,22 +392,22 @@ def _get_counters(asset_id, ip=None):
             f"ndr:asset:counters:{ip}",
         ])
     for key in candidates:
-        data = RedisClient.hgetall(key) or {}
+        data = StateStoreClient.hgetall(key) or {}
         if data:
             return data
     return {}
 
 
 def _get_summary(ip):
-    return RedisClient.hgetall(f"ndr:asset:summary:{ip}") or {}
+    return StateStoreClient.hgetall(f"ndr:asset:summary:{ip}") or {}
 
 
 def _get_top(ip):
-    return RedisClient.hgetall(f"ndr:asset:top:{ip}") or {}
+    return StateStoreClient.hgetall(f"ndr:asset:top:{ip}") or {}
 
 
 def _get_risk_score(asset_id):
-    risk_str = RedisClient.get(f"ndr:entity_risk:{asset_id}") or "0"
+    risk_str = StateStoreClient.get(f"ndr:entity_risk:{asset_id}") or "0"
     try:
         return int(float(risk_str))
     except (ValueError, TypeError):
@@ -502,7 +502,7 @@ def _collect_profiles():
     by_ip = {}
 
     # Primary profile keys
-    for key in RedisClient.scan_keys("ndr:assets:profile:*"):
+    for key in StateStoreClient.scan_keys("ndr:assets:profile:*"):
         profile = _safe_hgetall_if_hash(key)
         ip = _safe_ip(profile.get("ip"))
         if not ip:
@@ -512,7 +512,7 @@ def _collect_profiles():
         by_ip[ip] = profile
 
     # Legacy/preflight profile keys
-    for key in RedisClient.scan_keys("ndr:asset:*"):
+    for key in StateStoreClient.scan_keys("ndr:asset:*"):
         if any(x in key for x in [":summary:", ":top:", ":counters:", ":ip_index:", ":mac_index:", ":role:"]):
             continue
         profile = _safe_hgetall_if_hash(key)
@@ -545,7 +545,7 @@ def _bulk_risk_scores(asset_ids, batch_size=2000):
         return {}
     keys = [f"ndr:entity_risk:{aid}" for aid in asset_ids]
     out = {}
-    client = RedisClient.client
+    client = StateStoreClient.client
     for i in range(0, len(keys), batch_size):
         chunk = keys[i:i + batch_size]
         values = client.mget(chunk) or []
@@ -665,7 +665,7 @@ def _build_light_asset_card(profile, asset_id):
 
 class ProductionAssetRepository(AssetRepository):
     """
-    Reads assets from ndr-enrich's Redis keys (ndr:assets:profile:*) and
+    Reads assets from ndr-enrich's state keys (ndr:assets:profile:*) and
     merges with ndr-baseline summary/top keys for full enrichment.
 
     Key sources:
@@ -777,7 +777,7 @@ class ProductionAssetRepository(AssetRepository):
 
             # Fallback to preflight seed key if enrich hasn't run yet
             if not profile:
-                profile = RedisClient.hgetall(f"ndr:asset:{ip}") or {}
+                profile = StateStoreClient.hgetall(f"ndr:asset:{ip}") or {}
 
             # Fallback to synthetic profile when only baseline summary/top exists
             if not profile:
@@ -998,7 +998,7 @@ class ProductionAssetRepository(AssetRepository):
             }
 
             # ── 1. Fleet-level analytics from network-summary ──────────
-            net = RedisClient.hgetall("ndr:network:analytics") or {}
+            net = StateStoreClient.hgetall("ndr:network:analytics") or {}
             if net:
                 for field in ["kpis", "top_talkers_outbound", "top_talkers_lateral",
                                "protocol_stats", "unusual", "segment_matrix"]:

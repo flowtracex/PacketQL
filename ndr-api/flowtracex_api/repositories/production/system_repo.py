@@ -1,5 +1,4 @@
 from ..demo.system_repo import DemoSystemRepository
-from clients.redis_client import RedisClient
 import shutil
 import psutil
 import socket
@@ -38,16 +37,13 @@ class ProductionSystemRepository(DemoSystemRepository):
         cpu = psutil.cpu_percent()
         memory = psutil.virtual_memory().percent
         disk = psutil.disk_usage('/').percent
-        
-        # Check Redis
-        redis_status = "up" if RedisClient.client.ping() else "down"
-        
+
         return {
-            "status": "healthy" if redis_status == "up" else "degraded",
+            "status": "healthy",
             "cpu": cpu,
             "memory": memory,
             "disk": disk,
-            "services": {"redis": redis_status, "duckdb": "up"} # DuckDB is library, assumed up
+            "services": {"duckdb": "up"}
         }
 
     def get_identity(self):

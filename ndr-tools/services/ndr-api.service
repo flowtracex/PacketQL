@@ -1,8 +1,7 @@
 [Unit]
 Description=NDR API (Django)
 Documentation=https://github.com/your-org/ndr
-After=network.target redis.service
-Wants=redis.service
+After=network.target
 
 [Service]
 Type=simple
@@ -11,7 +10,7 @@ WorkingDirectory=/opt/tools/pcapql/ndr-api/flowtracex_api
 Environment=APP_MODE=production
 Environment=DJANGO_SETTINGS_MODULE=flowtracex_api.settings
 EnvironmentFile=-/opt/tools/pcapql/.env
-ExecStart=/usr/bin/python3 manage.py runserver 0.0.0.0:8000
+ExecStart=/usr/bin/python3 manage.py runserver 0.0.0.0:8010 --noreload
 Restart=on-failure
 RestartSec=3
 StandardOutput=journal

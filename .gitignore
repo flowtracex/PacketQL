@@ -59,6 +59,10 @@
 .env.*
 !.env.example
 
+# Local Docker build artifacts
+docker/zeek-runtime.tar.gz
+docker/kafka_2.13-3.7.1.tgz
+
 # IDE / OS
 /.vscode/*
 !/.vscode/settings.json

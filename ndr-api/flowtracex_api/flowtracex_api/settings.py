@@ -13,6 +13,20 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_list(name: str, default: list[str]) -> list[str]:
+    value = os.environ.get(name)
+    if not value:
+        return default
+    return [item.strip() for item in value.split(",") if item.strip()]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = Path(__file__).resolve().parents[3]
@@ -22,12 +36,13 @@ PROJECT_DIR = Path(__file__).resolve().parents[3]
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-35qb^f72+ze6(y@akea8n)yhy0b+_k-mop7%eyh709em68t2x^'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-35qb^f72+ze6(y@akea8n)yhy0b+_k-mop7%eyh709em68t2x^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+APP_MODE = os.environ.get('APP_MODE', 'demo')
+DEBUG = _env_bool('DJANGO_DEBUG', APP_MODE == 'demo')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', ['*'] if DEBUG else ['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -148,11 +163,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'authentication.User'
 
-CORS_ALLOW_ALL_ORIGINS = True # For development simplicity
-CORS_ALLOWED_ORIGINS = [
+CORS_ALLOW_ALL_ORIGINS = _env_bool('CORS_ALLOW_ALL_ORIGINS', DEBUG)
+CORS_ALLOWED_ORIGINS = _env_list('CORS_ALLOWED_ORIGINS', [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-]
+])
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -180,12 +195,6 @@ SIMPLE_JWT = {
 
 # NDR Platform Configuration
 # Infrastructure defaults below. Source of truth: /opt/ndr/ndr-config/infrastructure/
-APP_MODE = os.environ.get('APP_MODE', 'demo')
-
-# Redis — reads from env vars; defaults match ndr-config/infrastructure/redis.json
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
-REDIS_DB = int(os.environ.get('REDIS_DB', 0))
 
 # Data Directory (kept inside this project by default)
 DATA_DIR = Path(os.environ.get('NDR_DATA_DIR', str(PROJECT_DIR / 'data')))

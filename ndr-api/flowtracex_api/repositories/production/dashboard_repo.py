@@ -1,5 +1,5 @@
 from ..base.dashboard_repo import DashboardRepository
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
 from clients.duckdb_client import DuckDBClient
 import json
 import logging
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class ProductionDashboardRepository(DashboardRepository):
     """
-    Production dashboard repo — reads pre-computed data from Redis.
+    Production dashboard repo — reads pre-computed data from local state.
     All data is populated by ndr-baseline dashboard-analytics job every 10 min.
     Falls back to DuckDB on-demand computation on cache miss.
     """
@@ -23,16 +23,16 @@ class ProductionDashboardRepository(DashboardRepository):
         Non-hash keys are skipped safely.
         """
         profiles = []
-        client = RedisClient.client
+        client = StateStoreClient.client
 
         def _add_from_pattern(pattern, skip_tokens):
-            for key in RedisClient.scan_keys(pattern):
+            for key in StateStoreClient.scan_keys(pattern):
                 if any(tok in key for tok in skip_tokens):
                     continue
                 try:
                     if client.type(key) != "hash":
                         continue
-                    data = RedisClient.hgetall(key) or {}
+                    data = StateStoreClient.hgetall(key) or {}
                     if data:
                         profiles.append(data)
                 except Exception:
@@ -43,11 +43,11 @@ class ProductionDashboardRepository(DashboardRepository):
         return profiles
 
     def get_overview_metrics(self):
-        cached = RedisClient.get("dashboard:overview")
+        cached = StateStoreClient.get("dashboard:overview")
         if cached:
             return json.loads(cached)
 
-        # Fallback — compute best-effort metrics from DuckDB + Redis.
+        # Fallback — compute best-effort metrics from DuckDB + local state.
         logger.warning("Cache miss for dashboard:overview — computing fallback metrics")
         critical = 0
         high = 0
@@ -113,7 +113,7 @@ class ProductionDashboardRepository(DashboardRepository):
     def get_traffic_metrics(self, range_str):
         # Try specific range first, fall back to 24h
         for key in [f"dashboard:traffic:{range_str}", "dashboard:traffic:24h"]:
-            cached = RedisClient.get(key)
+            cached = StateStoreClient.get(key)
             if cached:
                 return json.loads(cached)
 
@@ -137,7 +137,7 @@ class ProductionDashboardRepository(DashboardRepository):
             return {"dataPoints": []}
 
     def get_protocol_distribution(self):
-        cached = RedisClient.get("dashboard:protocols")
+        cached = StateStoreClient.get("dashboard:protocols")
         if cached:
             return json.loads(cached)
 
@@ -161,7 +161,7 @@ class ProductionDashboardRepository(DashboardRepository):
             return {"protocols": []}
 
     def get_deep_inspection_coverage(self):
-        cached = RedisClient.get("dashboard:deep_inspection")
+        cached = StateStoreClient.get("dashboard:deep_inspection")
         if cached:
             return json.loads(cached)
 

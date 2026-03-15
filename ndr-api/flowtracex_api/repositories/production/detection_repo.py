@@ -1,60 +1,40 @@
 import json
-import os
 import sqlite3
 import logging
 from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 from ..base.detection_repo import DetectionRepository
+from clients.state_store_client import StateStoreClient
 
 logger = logging.getLogger(__name__)
 
-# ── Redis connection for metadata enrichment ──
-try:
-    import redis
-    _REDIS = redis.Redis(
-        host=os.environ.get('REDIS_HOST', 'localhost'),
-        port=int(os.environ.get('REDIS_PORT', '6379')),
-        decode_responses=True,
-        socket_connect_timeout=2,
-    )
-    _REDIS.ping()
-except Exception:
-    _REDIS = None
-
-
 def _get_signal_meta(signal_id: str) -> dict:
-    """Read signal metadata from Redis."""
-    if not _REDIS:
-        return {}
+    """Read signal metadata from local control-plane state."""
     try:
-        raw = _REDIS.get(f'ndr:signal:{signal_id}:meta')
+        raw = StateStoreClient.get(f'ndr:signal:{signal_id}:meta')
         return json.loads(raw) if raw else {}
     except Exception:
         return {}
 
 
 def _get_usecase_meta(uc_id: str) -> dict:
-    """Read use case metadata from Redis."""
-    if not _REDIS:
-        return {}
+    """Read use case metadata from local control-plane state."""
     try:
-        raw = _REDIS.get(f'ndr:usecase:{uc_id}:meta')
+        raw = StateStoreClient.get(f'ndr:usecase:{uc_id}:meta')
         return json.loads(raw) if raw else {}
     except Exception:
         return {}
 
 
 def _get_asset_info(asset_id: str) -> dict:
-    """Read asset info (IP, hostname, OS, etc.) from Redis."""
-    if not _REDIS:
-        return {}
+    """Read asset info (IP, hostname, OS, etc.) from local state."""
     try:
         # Current enrich/profiler path stores assets under ndr:assets:profile:<asset_id>.
         # Keep legacy fallback for older data.
-        data = _REDIS.hgetall(f'ndr:assets:profile:{asset_id}')
+        data = StateStoreClient.hgetall(f'ndr:assets:profile:{asset_id}')
         if not data:
-            data = _REDIS.hgetall(f'ndr:asset:{asset_id}')
+            data = StateStoreClient.hgetall(f'ndr:asset:{asset_id}')
         if not data:
             return {}
 
@@ -252,7 +232,7 @@ class ProductionDetectionRepository(DetectionRepository):
 
             items = [_parse_json_fields(dict(r)) for r in rows]
 
-            # Enrich each incident with asset_info from Redis
+            # Enrich each incident with asset_info from local state
             for item in items:
                 aid = item.get('asset_id', '')
                 if aid:
@@ -304,7 +284,7 @@ class ProductionDetectionRepository(DetectionRepository):
 
     @staticmethod
     def _enrich_incident(item: dict, conn=None) -> dict:
-        """Enrich incident with Redis signal + use case metadata."""
+        """Enrich incident with local signal and use-case metadata."""
         evidence = item.get('evidence') or {}
         asset_id = item.get('asset_id', '')
 
@@ -385,7 +365,7 @@ class ProductionDetectionRepository(DetectionRepository):
             if all_ftx:
                 item['ftx_ids'] = ','.join(all_ftx)
 
-        # ── Add use_case_meta from Redis ──
+        # ── Add use_case_meta from local state ──
         uc_id = item.get('use_case_id', '')
         if uc_id:
             uc_meta = _get_usecase_meta(uc_id)
@@ -400,7 +380,7 @@ class ProductionDetectionRepository(DetectionRepository):
                     'eval_mode': uc_meta.get('eval_mode', ''),
                 }
 
-        # ── Add asset info from Redis ──
+        # ── Add asset info from local state ──
         if asset_id:
             asset = _get_asset_info(asset_id)
             if asset:
@@ -459,7 +439,7 @@ class ProductionDetectionRepository(DetectionRepository):
 
             items = [_parse_json_fields(dict(r)) for r in rows]
 
-            # Enrich each alert with asset_info and signal meta from Redis
+            # Enrich each alert with asset_info and signal meta from local state
             for item in items:
                 aid = item.get('asset_id', '')
                 if aid:

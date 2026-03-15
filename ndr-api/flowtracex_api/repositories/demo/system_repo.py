@@ -17,7 +17,7 @@ class DemoSystemRepository(SystemRepository):
             "cpu": 15,
             "memory": 40,
             "disk": 20,
-            "services": {"redis": "up", "duckdb": "up", "celery": "up"}
+            "services": {"duckdb": "up", "celery": "up"}
         }
 
     def get_logs(self, filters, page=1, limit=10):

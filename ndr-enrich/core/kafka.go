@@ -52,7 +52,9 @@ func NewConsumer(cfg KafkaConfig) (*Consumer, error) {
 
 	return &Consumer{
 		reader: reader,
-		output: make(chan *ZeekLog, 1000), // Buffered channel
+		// Use a deeper buffer so brief downstream bursts do not stall Kafka reads.
+		// We still apply backpressure below instead of dropping messages.
+		output: make(chan *ZeekLog, 10000),
 		errors: make(chan error, 100),
 	}, nil
 }
@@ -123,17 +125,13 @@ func (c *Consumer) Start(ctx context.Context) {
 			// Store raw JSON string
 			zeekLog.Raw = string(msg.Value)
 
-			// Emit parsed event (non-blocking if channel has capacity)
-			// ReadMessage auto-commits, so no need to commit manually
+			// Emit parsed event and apply backpressure if downstream is slower.
+			// Dropping normalized security events is worse than temporarily
+			// slowing Kafka consumption in the single-node deployment.
 			select {
 			case c.output <- &zeekLog:
-				// Message successfully emitted
 			case <-ctx.Done():
 				return
-			default:
-				// Channel full - this should not happen with proper buffering
-				// Send error to centralized error handler
-				c.errors <- fmt.Errorf("output channel full, dropping message")
 			}
 		}
 	}
@@ -148,4 +146,3 @@ func (c *Consumer) Output() <-chan *ZeekLog {
 func (c *Consumer) Errors() <-chan error {
 	return c.errors
 }
-

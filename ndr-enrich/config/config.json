@@ -23,13 +23,6 @@
             "compression": "none"
         }
     },
-    "redis": {
-        "host": "localhost",
-        "port": 6379,
-        "password": "",
-        "database": 0,
-        "pool_size": 10
-    },
     "asset_profiler": {
         "enabled": true,
         "sync_interval_seconds": 60,
@@ -38,9 +31,9 @@
     "normalization_path": "/opt/tools/pcapql/ndr-config/schemas/zeek/normalization.json",
     "classification_rules_path": "/opt/tools/pcapql/ndr-config/datasets/enrich/asset_classification.csv",
     "write": {
-        "flush_buffer_mb": 16,
-        "flush_interval_seconds": 30,
-        "flush_event_count": 10000
+        "flush_buffer_mb": 1,
+        "flush_interval_seconds": 5,
+        "flush_event_count": 1000
     },
     "log": {
         "path": "/opt/tools/pcapql/logs/ndr-enrich.log"

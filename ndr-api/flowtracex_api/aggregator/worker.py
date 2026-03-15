@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from apps.rules.models import Rule, RuleStats
 from clients.duckdb_client import DuckDBClient
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
 
 logger = logging.getLogger('aggregator')
 
@@ -42,7 +42,7 @@ class AggregatorWorker:
          if settings.APP_MODE == 'demo':
             return
             
-         # Calculate network stats from DuckDB and cache in Redis
+         # Calculate network stats from DuckDB and cache in the local state store
          # stats = ...
-         # RedisClient.set("network:analytics", json.dumps(stats))
+         # StateStoreClient.set("network:analytics", json.dumps(stats))
          pass

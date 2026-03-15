@@ -1,5 +1,5 @@
 """
-Control Plane Service — Reads/writes Redis control plane keys with validation.
+Control Plane Service — reads and writes local control-plane state with validation.
 
 All threshold writes enforce: new_value >= engineering_min_threshold.
 This is the backend guard that prevents users/agents from ever weakening
@@ -10,16 +10,16 @@ import logging
 import os
 from pathlib import Path
 
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
 
 logger = logging.getLogger(__name__)
 
 
 class ControlPlaneService:
-    """Service layer for control plane Redis operations."""
+    """Service layer for control plane state operations."""
 
     def __init__(self):
-        self._redis = RedisClient.get_instance()
+        self._state_store = StateStoreClient.get_instance()
         self._signal_defaults = {}
         self._uc_defaults = {}
         self._global_schema = {}
@@ -160,10 +160,10 @@ class ControlPlaneService:
     def get_global_config(self) -> dict:
         """Read all ndr:global:* keys."""
         return {
-            "sensitivity": self._redis.get("ndr:global:sensitivity") or "balanced",
-            "alert_threshold": int(self._redis.get("ndr:global:alert_threshold") or "100"),
-            "critical_mode": (self._redis.get("ndr:global:critical_mode") or "false") == "true",
-            "asset_scope": self._redis.get("ndr:global:asset_scope") or "all",
+            "sensitivity": self._state_store.get("ndr:global:sensitivity") or "balanced",
+            "alert_threshold": int(self._state_store.get("ndr:global:alert_threshold") or "100"),
+            "critical_mode": (self._state_store.get("ndr:global:critical_mode") or "false") == "true",
+            "asset_scope": self._state_store.get("ndr:global:asset_scope") or "all",
             "sensitivity_modes": self._global_schema.get("sensitivity_modes", {}),
             "engineering_min_alert_threshold": self._global_schema.get("engineering_min_alert_threshold", 100),
         }
@@ -176,19 +176,19 @@ class ControlPlaneService:
         if "sensitivity" in data:
             if data["sensitivity"] not in valid_sensitivities:
                 raise ValueError(f"Invalid sensitivity: {data['sensitivity']}. Valid: {valid_sensitivities}")
-            self._redis.set("ndr:global:sensitivity", data["sensitivity"])
+            self._state_store.set("ndr:global:sensitivity", data["sensitivity"])
 
         if "alert_threshold" in data:
             val = int(data["alert_threshold"])
             if val < eng_min:
                 raise ValueError(f"Alert threshold cannot be below engineering minimum ({eng_min})")
-            self._redis.set("ndr:global:alert_threshold", str(val))
+            self._state_store.set("ndr:global:alert_threshold", str(val))
 
         if "critical_mode" in data:
-            self._redis.set("ndr:global:critical_mode", str(data["critical_mode"]).lower())
+            self._state_store.set("ndr:global:critical_mode", str(data["critical_mode"]).lower())
 
         if "asset_scope" in data:
-            self._redis.set("ndr:global:asset_scope", data["asset_scope"])
+            self._state_store.set("ndr:global:asset_scope", data["asset_scope"])
 
         return self.get_global_config()
 
@@ -200,12 +200,12 @@ class ControlPlaneService:
         for sig_id, defaults in sorted(self._signal_defaults.items()):
             prefix = f"ndr:signal:{sig_id}"
             current = {
-                "enabled": (self._redis.get(f"{prefix}:enabled") or "true") == "true",
-                "ui_threshold": int(self._redis.get(f"{prefix}:ui_threshold") or str(defaults.get("engineering_min_threshold", 1))),
-                "visibility_mode": self._redis.get(f"{prefix}:visibility_mode") or defaults.get("default_visibility_mode", "anomaly"),
-                "severity_label": self._redis.get(f"{prefix}:severity_label") or "",
-                "suppressed": self._redis.get(f"ndr:suppress:{sig_id}") is not None,
-                "suppress_ttl": self._redis.ttl(f"ndr:suppress:{sig_id}") if self._redis.get(f"ndr:suppress:{sig_id}") else None,
+                "enabled": (self._state_store.get(f"{prefix}:enabled") or "true") == "true",
+                "ui_threshold": int(self._state_store.get(f"{prefix}:ui_threshold") or str(defaults.get("engineering_min_threshold", 1))),
+                "visibility_mode": self._state_store.get(f"{prefix}:visibility_mode") or defaults.get("default_visibility_mode", "anomaly"),
+                "severity_label": self._state_store.get(f"{prefix}:severity_label") or "",
+                "suppressed": self._state_store.get(f"ndr:suppress:{sig_id}") is not None,
+                "suppress_ttl": self._state_store.ttl(f"ndr:suppress:{sig_id}") if self._state_store.get(f"ndr:suppress:{sig_id}") else None,
             }
             result.append({
                 "signal_id": sig_id,
@@ -222,12 +222,12 @@ class ControlPlaneService:
 
         prefix = f"ndr:signal:{signal_id}"
         current = {
-            "enabled": (self._redis.get(f"{prefix}:enabled") or "true") == "true",
-            "ui_threshold": int(self._redis.get(f"{prefix}:ui_threshold") or str(defaults.get("engineering_min_threshold", 1))),
-            "visibility_mode": self._redis.get(f"{prefix}:visibility_mode") or "anomaly",
-            "severity_label": self._redis.get(f"{prefix}:severity_label") or "",
-            "suppressed": self._redis.get(f"ndr:suppress:{signal_id}") is not None,
-            "suppress_ttl": self._redis.ttl(f"ndr:suppress:{signal_id}") if self._redis.get(f"ndr:suppress:{signal_id}") else None,
+            "enabled": (self._state_store.get(f"{prefix}:enabled") or "true") == "true",
+            "ui_threshold": int(self._state_store.get(f"{prefix}:ui_threshold") or str(defaults.get("engineering_min_threshold", 1))),
+            "visibility_mode": self._state_store.get(f"{prefix}:visibility_mode") or "anomaly",
+            "severity_label": self._state_store.get(f"{prefix}:severity_label") or "",
+            "suppressed": self._state_store.get(f"ndr:suppress:{signal_id}") is not None,
+            "suppress_ttl": self._state_store.ttl(f"ndr:suppress:{signal_id}") if self._state_store.get(f"ndr:suppress:{signal_id}") else None,
         }
         return {"signal_id": signal_id, **defaults, "current": current}
 
@@ -244,18 +244,18 @@ class ControlPlaneService:
             val = int(data["ui_threshold"])
             if val < eng_min:
                 raise ValueError(f"Cannot set threshold below engineering minimum ({eng_min})")
-            self._redis.set(f"{prefix}:ui_threshold", str(val))
+            self._state_store.set(f"{prefix}:ui_threshold", str(val))
 
         if "enabled" in data:
-            self._redis.set(f"{prefix}:enabled", "true" if data["enabled"] else "false")
+            self._state_store.set(f"{prefix}:enabled", "true" if data["enabled"] else "false")
 
         if "visibility_mode" in data:
             if data["visibility_mode"] not in ("alert", "anomaly", "hidden"):
                 raise ValueError(f"Invalid visibility mode: {data['visibility_mode']}")
-            self._redis.set(f"{prefix}:visibility_mode", data["visibility_mode"])
+            self._state_store.set(f"{prefix}:visibility_mode", data["visibility_mode"])
 
         if "severity_label" in data:
-            self._redis.set(f"{prefix}:severity_label", data["severity_label"])
+            self._state_store.set(f"{prefix}:severity_label", data["severity_label"])
 
         return self.get_signal(signal_id)
 
@@ -263,12 +263,12 @@ class ControlPlaneService:
         """Suppress a signal for a TTL period."""
         if signal_id not in self._signal_defaults:
             raise ValueError(f"Unknown signal: {signal_id}")
-        self._redis.set(f"ndr:suppress:{signal_id}", "true", ex=ttl_seconds)
+        self._state_store.set(f"ndr:suppress:{signal_id}", "true", ex=ttl_seconds)
         return {"signal_id": signal_id, "suppressed": True, "ttl_seconds": ttl_seconds, "reason": reason}
 
     def remove_signal_suppression(self, signal_id: str) -> bool:
         """Remove signal suppression."""
-        return bool(self._redis.delete(f"ndr:suppress:{signal_id}"))
+        return bool(self._state_store.delete(f"ndr:suppress:{signal_id}"))
 
     # ─── Use Case Controls ──────────────────────────────────────────
 
@@ -278,10 +278,10 @@ class ControlPlaneService:
         for uc_id, defaults in sorted(self._uc_defaults.items()):
             prefix = f"ndr:uc:{uc_id}"
             current = {
-                "enabled": (self._redis.get(f"{prefix}:enabled") or "true") == "true",
-                "threshold": int(self._redis.get(f"{prefix}:threshold") or str(defaults.get("engineering_min_alert_threshold", 100))),
-                "suppressed": self._redis.get(f"ndr:suppress:{uc_id}") is not None,
-                "suppress_ttl": self._redis.ttl(f"ndr:suppress:{uc_id}") if self._redis.get(f"ndr:suppress:{uc_id}") else None,
+                "enabled": (self._state_store.get(f"{prefix}:enabled") or "true") == "true",
+                "threshold": int(self._state_store.get(f"{prefix}:threshold") or str(defaults.get("engineering_min_alert_threshold", 100))),
+                "suppressed": self._state_store.get(f"ndr:suppress:{uc_id}") is not None,
+                "suppress_ttl": self._state_store.ttl(f"ndr:suppress:{uc_id}") if self._state_store.get(f"ndr:suppress:{uc_id}") else None,
             }
             result.append({"uc_id": uc_id, **defaults, "current": current})
         return result
@@ -293,10 +293,10 @@ class ControlPlaneService:
             return None
         prefix = f"ndr:uc:{uc_id}"
         current = {
-            "enabled": (self._redis.get(f"{prefix}:enabled") or "true") == "true",
-            "threshold": int(self._redis.get(f"{prefix}:threshold") or "100"),
-            "suppressed": self._redis.get(f"ndr:suppress:{uc_id}") is not None,
-            "suppress_ttl": self._redis.ttl(f"ndr:suppress:{uc_id}") if self._redis.get(f"ndr:suppress:{uc_id}") else None,
+            "enabled": (self._state_store.get(f"{prefix}:enabled") or "true") == "true",
+            "threshold": int(self._state_store.get(f"{prefix}:threshold") or "100"),
+            "suppressed": self._state_store.get(f"ndr:suppress:{uc_id}") is not None,
+            "suppress_ttl": self._state_store.ttl(f"ndr:suppress:{uc_id}") if self._state_store.get(f"ndr:suppress:{uc_id}") else None,
         }
         return {"uc_id": uc_id, **defaults, "current": current}
 
@@ -313,10 +313,10 @@ class ControlPlaneService:
             val = int(data["threshold"])
             if val < eng_min:
                 raise ValueError(f"Cannot set threshold below engineering minimum ({eng_min})")
-            self._redis.set(f"{prefix}:threshold", str(val))
+            self._state_store.set(f"{prefix}:threshold", str(val))
 
         if "enabled" in data:
-            self._redis.set(f"{prefix}:enabled", "true" if data["enabled"] else "false")
+            self._state_store.set(f"{prefix}:enabled", "true" if data["enabled"] else "false")
 
         return self.get_usecase(uc_id)
 
@@ -324,22 +324,22 @@ class ControlPlaneService:
         """Suppress a UC for a TTL period."""
         if uc_id not in self._uc_defaults:
             raise ValueError(f"Unknown use case: {uc_id}")
-        self._redis.set(f"ndr:suppress:{uc_id}", "true", ex=ttl_seconds)
+        self._state_store.set(f"ndr:suppress:{uc_id}", "true", ex=ttl_seconds)
         return {"uc_id": uc_id, "suppressed": True, "ttl_seconds": ttl_seconds, "reason": reason}
 
     def remove_usecase_suppression(self, uc_id: str) -> bool:
         """Remove UC suppression."""
-        return bool(self._redis.delete(f"ndr:suppress:{uc_id}"))
+        return bool(self._state_store.delete(f"ndr:suppress:{uc_id}"))
 
     # ─── Suppression Center ─────────────────────────────────────────
 
     def get_all_suppressions(self) -> list:
         """List all active suppressions with TTL remaining."""
         result = []
-        keys = self._redis.keys("ndr:suppress:*")
+        keys = self._state_store.keys("ndr:suppress:*")
         for key in sorted(keys):
             entity_id = key.replace("ndr:suppress:", "")
-            ttl = self._redis.ttl(key)
+            ttl = self._state_store.ttl(key)
             entity_type = "signal" if entity_id.startswith("SIG-") else "usecase"
             name = ""
             if entity_type == "signal":
@@ -375,7 +375,7 @@ class ControlPlaneService:
         # Apply suppressions
         for entity_id, sup in preset.get("suppressions", {}).items():
             ttl = sup.get("ttl_seconds", 86400)
-            self._redis.set(f"ndr:suppress:{entity_id}", "true", ex=ttl)
+            self._state_store.set(f"ndr:suppress:{entity_id}", "true", ex=ttl)
 
         return {
             "preset": preset_name,

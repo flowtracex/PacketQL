@@ -8,7 +8,6 @@ Single source of truth for all NDR platform configuration. Every project reads f
 ndr-config/
 ├── infra/                         Shared connections
 │   ├── kafka.json                 Kafka brokers, topics
-│   ├── redis.json                 Redis host, port, pool
 │   └── paths.json                 File system paths
 │
 ├── platform/                      Platform behavior
@@ -62,7 +61,6 @@ config_dir = os.environ.get("NDR_CONFIG_DIR", "/opt/ndr/ndr-config")
 
 | File | Consumers |
 |------|-----------|
-| `infra/redis.json` | ndr-enrich, ndr-baseline, ndr-flink, ndr-api |
 | `infra/kafka.json` | ndr-enrich, ndr-flink |
 | `schemas/zeek/fields.json` | generate_schema.go, generate_field_catalog.go |
 | `schemas/zeek/normalization.json` | generate_schema.go, generate_field_catalog.go |

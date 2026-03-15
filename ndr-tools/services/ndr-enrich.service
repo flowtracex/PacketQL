@@ -1,8 +1,8 @@
 [Unit]
 Description=NDR Enrichment Pipeline (Go)
 Documentation=https://github.com/your-org/ndr
-After=network.target kafka.service redis.service
-Wants=kafka.service redis.service
+After=network.target kafka.service
+Wants=kafka.service
 
 [Service]
 Type=simple

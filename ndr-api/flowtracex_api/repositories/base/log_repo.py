@@ -6,7 +6,7 @@ class LogRepository(ABC):
         pass
 
     @abstractmethod
-    def get_analytics(self):
+    def get_analytics(self, window="24h", source_id=None):
         pass
 
     @abstractmethod

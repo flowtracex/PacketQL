@@ -39,7 +39,6 @@ type Config struct {
 			Compression string   `json:"compression"`
 		} `json:"kafka"`
 	} `json:"output"`
-	Redis core.RedisConfig       `json:"redis"`
 	AssetProfiler core.AssetProfilerConfig `json:"asset_profiler"`
 	Write struct {
 		FlushBufferMB      int `json:"flush_buffer_mb"`
@@ -231,21 +230,20 @@ func main() {
 		fanOut.AddOutput(pipelineFlowInput)
 	}
 
-	// Setup Redis + Identity Resolver (needed by both Kafka output and Asset Profiler)
-	var redisClient *core.RedisClient
+	// Setup local state store + identity resolver (needed by Kafka output and asset profiler)
+	var stateStore *core.StateStore
 	var identityResolver *core.IdentityResolver
 	if config.AssetProfiler.Enabled {
-		// Connect to Redis
-		redisClient, err = core.NewRedisClient(config.Redis)
+		stateStore, err = core.NewStateStore(core.StateStoreConfig{})
 		if err != nil {
-			logger.Fatal("startup", "redis connection failed", fmt.Sprintf("error=%v", err))
+			logger.Fatal("startup", "state store initialization failed", fmt.Sprintf("error=%v", err))
 		}
-		logger.Info("startup", "redis connected", fmt.Sprintf("host=%s:%d", config.Redis.Host, config.Redis.Port))
+		logger.Info("startup", "local state store ready", "in-memory asset state enabled")
 
-		// Create identity resolver (uses same Redis client)
+		// Create identity resolver (uses the same local state store)
 		identityResolver = core.NewIdentityResolver(core.IdentityResolverConfig{
 			DefaultLeaseTTL: 3600, // 1 hour default
-		}, redisClient)
+		}, stateStore)
 		logger.Info("startup", "identity resolver created", "mac-anchored asset_id generation enabled")
 	}
 
@@ -267,13 +265,13 @@ func main() {
 		kafkaProducer = producer
 	}
 
-	// Setup Asset Profiler (if enabled — uses Redis + resolver created above)
+	// Setup asset profiler (if enabled — uses local state + resolver created above)
 	var assetProfiler *core.AssetProfiler
 	if config.AssetProfiler.Enabled {
 		assetProfilerInput := make(chan *core.EnrichedEvent, 10000)
 		fanOut.AddOutput(assetProfilerInput)
 
-		assetProfiler = core.NewAssetProfiler(config.AssetProfiler, redisClient, identityResolver, assetProfilerInput)
+		assetProfiler = core.NewAssetProfiler(config.AssetProfiler, stateStore, identityResolver, assetProfilerInput)
 		state.assetProfiler = assetProfiler
 	}
 
@@ -530,9 +528,9 @@ func main() {
 	// Wait for all goroutines to finish
 	wg.Wait()
 
-	// Close Redis connection
-	if redisClient != nil {
-		redisClient.Close()
+	// Close local state store
+	if stateStore != nil {
+		stateStore.Close()
 	}
 
 	logger.Info("shutdown", "pipeline stopped", "")

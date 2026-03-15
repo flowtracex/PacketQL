@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #0c0c0e;
+  background: #16181d;
   color: #e5e7eb;
 }
 
@@ -19,16 +19,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1c;
+  background: #111214;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #32363c;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #434a53;
 }
 
 /* Tailwind animations */

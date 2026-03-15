@@ -6,7 +6,7 @@
  */
 
 // @ts-ignore - Vite env may not have types in all configs
-const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || '/api/v1';
+export const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || '/api/v1';
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ export const huntApi = {
     /**
      * Run a hunt (execute query against Parquet data).
      */
-    run: (params: { hunt_id?: string; query_type: 'sql' | 'visual'; query?: string; log_source?: string; conditions?: any[] }) =>
+    run: (params: { hunt_id?: string; query_type: 'sql' | 'visual'; query?: string; log_source?: string; conditions?: any[]; source_id?: string }) =>
         apiFetch<HuntRunResponse>(`/hunting/run`, {
             method: 'POST',
             body: JSON.stringify(params),

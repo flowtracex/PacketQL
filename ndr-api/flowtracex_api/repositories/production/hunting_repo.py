@@ -1,6 +1,9 @@
 from ..base.hunting_repo import HuntingRepository
 from clients.duckdb_client import DuckDBClient
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
+from apps.logs.data_sources import resolve_source
+from django.conf import settings
+from pathlib import Path
 import json
 import time
 import uuid
@@ -93,7 +96,11 @@ class ProductionHuntingRepository(HuntingRepository):
     def run_hunt(self, query_type, params):
         start_time = time.time()
         hunt_id = params.get('hunt_id')
-        available_tables = set(DuckDBClient.get_available_tables())
+        source_id = params.get('source_id')
+        data_dir = Path(getattr(settings, "DATA_DIR", Path(".")))
+        ds = resolve_source(data_dir, source_id)
+        parquet_base = Path(ds.parquet_dir) if ds else None
+        available_tables = set(DuckDBClient.get_available_tables(parquet_base=parquet_base))
         
         # Build query
         query = ""
@@ -170,7 +177,7 @@ class ProductionHuntingRepository(HuntingRepository):
 
         # Execute
         try:
-            results_df = DuckDBClient.execute_df(query)
+            results_df = DuckDBClient.execute_df(query, parquet_base=parquet_base)
             execution_time = time.time() - start_time
             
             results = []

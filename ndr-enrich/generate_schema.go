@@ -427,11 +427,11 @@ CREATE TABLE IF NOT EXISTS ndr_enriched (
     event_type          STRING,                 -- e.g. 'network_connection','dns','ssh'
     event_class         STRING,                 -- e.g. 'network','authentication','application'
 
-    -- Asset enrichment (set by Go via Redis)
+    -- Asset enrichment (set by Go via the local state store)
     asset_id            STRING,
     asset_type          STRING,                 -- workstation, server, docker, iot, network_device
 
-    -- Threat enrichment (set by Go via Redis)
+    -- Threat enrichment (set by Go via the local state store)
     src_is_blacklisted  BOOLEAN,
     dst_is_blacklisted  BOOLEAN,
     src_reputation      STRING,

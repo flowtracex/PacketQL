@@ -29,13 +29,13 @@ type AssetIdentity struct {
 //   - Non-DHCP events look up src_ip → MAC → asset_id
 //   - MAC is the primary anchor; hostname is the fallback for randomized MACs
 //
-// In-memory caches (ipToMAC, macToAsset, hostnameToAsset) are backed by Redis
-// for persistence. The hot-path ResolveIP() reads from cache with Redis fallback.
+// In-memory caches (ipToMAC, macToAsset, hostnameToAsset) are backed by the local state store
+// for persistence. The hot-path ResolveIP() reads from cache with store fallback.
 type IdentityResolver struct {
-	redis  *RedisClient
+	store  *StateStore
 	config IdentityResolverConfig
 
-	// In-memory caches (hot path — avoid Redis round-trips per event)
+	// In-memory caches (hot path — avoid state store round-trips per event)
 	ipToMAC         map[string]string         // IP → MAC
 	ipToAsset       map[string]string         // IP → asset_id fallback (for non-DHCP internal hosts)
 	macToAsset      map[string]string         // MAC → asset_id
@@ -51,13 +51,13 @@ type IdentityResolver struct {
 }
 
 // NewIdentityResolver creates a new identity resolver
-func NewIdentityResolver(cfg IdentityResolverConfig, redisClient *RedisClient) *IdentityResolver {
+func NewIdentityResolver(cfg IdentityResolverConfig, stateStore *StateStore) *IdentityResolver {
 	if cfg.DefaultLeaseTTL <= 0 {
 		cfg.DefaultLeaseTTL = 3600 // 1 hour default
 	}
 
 	return &IdentityResolver{
-		redis:           redisClient,
+		store:           stateStore,
 		config:          cfg,
 		ipToMAC:         make(map[string]string, 10000),
 		ipToAsset:       make(map[string]string, 10000),
@@ -128,7 +128,7 @@ func (ir *IdentityResolver) ProcessDHCP(mac, ip, hostname string, leaseTimeSec i
 		if oldAssetID, ok := ir.macToAsset[oldMAC]; ok {
 			logger.Info("identity", "ip_conflict_eviction",
 				fmt.Sprintf("ip=%s old_mac=%s old_asset=%s new_mac=%s", ip, oldMAC, oldAssetID, mac))
-			// Remove IP from old asset's known IPs in Redis
+			// Remove IP from old asset's known IPs in the state store
 			ir.removeIPFromAsset(oldAssetID, ip)
 		}
 	}
@@ -136,14 +136,14 @@ func (ir *IdentityResolver) ProcessDHCP(mac, ip, hostname string, leaseTimeSec i
 	// --- Step 2: Register IP→MAC mapping ---
 	ir.ipToMAC[ip] = mac
 
-	// Persist to Redis with TTL
-	if ir.redis != nil {
+	// Persist to state store with TTL
+	if ir.store != nil {
 		ttl := leaseTimeSec
 		if ttl <= 0 {
 			ttl = ir.config.DefaultLeaseTTL
 		}
 		ctx := context.Background()
-		ir.redis.SetWithTTL(ctx, fmt.Sprintf("ndr:assets:ip_to_mac:%s", ip), mac, time.Duration(ttl)*time.Second)
+		ir.store.SetWithTTL(ctx, fmt.Sprintf("ndr:assets:ip_to_mac:%s", ip), mac, time.Duration(ttl)*time.Second)
 	}
 
 	// --- Step 3: Resolve MAC → asset_id ---
@@ -154,17 +154,17 @@ func (ir *IdentityResolver) ProcessDHCP(mac, ip, hostname string, leaseTimeSec i
 		if _, macKnown := ir.macToAsset[mac]; !macKnown {
 			ir.macToAsset[mac] = fallbackAssetID
 			assetID = fallbackAssetID
-			if ir.redis != nil {
+			if ir.store != nil {
 				ctx := context.Background()
-				ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), fallbackAssetID, 0)
+				ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), fallbackAssetID, 0)
 			}
 		}
 	}
 
 	ir.ipToAsset[ip] = assetID
-	if ir.redis != nil {
+	if ir.store != nil {
 		ctx := context.Background()
-		ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip), assetID, 0)
+		ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip), assetID, 0)
 	}
 
 	// --- Step 4: Update asset profile ---
@@ -181,10 +181,10 @@ func (ir *IdentityResolver) ProcessDHCP(mac, ip, hostname string, leaseTimeSec i
 		identity.Hostname = hostname
 	}
 
-	// --- Step 5: Add IP to asset's known IPs in Redis ---
-	if ir.redis != nil {
+	// --- Step 5: Add IP to asset's known IPs in state store ---
+	if ir.store != nil {
 		ctx := context.Background()
-		ir.redis.SAdd(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
+		ir.store.SAdd(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
 	}
 
 	logger.Info("identity", "dhcp_registered",
@@ -201,9 +201,9 @@ func (ir *IdentityResolver) resolveOrCreateAssetID(mac, hostname string) string 
 		// Update hostname mapping if we have one
 		if hostname != "" {
 			ir.hostnameToAsset[hostname] = assetID
-			if ir.redis != nil {
+			if ir.store != nil {
 				ctx := context.Background()
-				ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:hostname_to_asset:%s", hostname), assetID, 0)
+				ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:hostname_to_asset:%s", hostname), assetID, 0)
 			}
 		}
 		return assetID
@@ -214,9 +214,9 @@ func (ir *IdentityResolver) resolveOrCreateAssetID(mac, hostname string) string 
 		if assetID, ok := ir.hostnameToAsset[hostname]; ok {
 			// Known hostname with randomized MAC — reuse existing asset_id
 			ir.macToAsset[mac] = assetID
-			if ir.redis != nil {
+			if ir.store != nil {
 				ctx := context.Background()
-				ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), assetID, 0)
+				ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), assetID, 0)
 			}
 			return assetID
 		}
@@ -224,11 +224,11 @@ func (ir *IdentityResolver) resolveOrCreateAssetID(mac, hostname string) string 
 
 	// Brand new device — generate short AST-NNNN asset_id
 	var assetID string
-	if ir.redis != nil {
+	if ir.store != nil {
 		ctx := context.Background()
-		counter, err := ir.redis.client.Incr(ctx, "ndr:assets:counter").Result()
+		counter, err := ir.store.client.Incr(ctx, "ndr:assets:counter").Result()
 		if err != nil {
-			// Fallback to UUID if Redis fails
+			// Fallback to UUID if state store fails
 			assetID = uuid.New().String()
 		} else {
 			assetID = fmt.Sprintf("AST-%04d", counter)
@@ -239,29 +239,29 @@ func (ir *IdentityResolver) resolveOrCreateAssetID(mac, hostname string) string 
 
 	// Store MAC→asset_id
 	ir.macToAsset[mac] = assetID
-	if ir.redis != nil {
+	if ir.store != nil {
 		ctx := context.Background()
-		ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), assetID, 0)
+		ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac), assetID, 0)
 	}
 
 	// Store hostname→asset_id if hostname is known
 	if hostname != "" {
 		ir.hostnameToAsset[hostname] = assetID
-		if ir.redis != nil {
+		if ir.store != nil {
 			ctx := context.Background()
-			ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:hostname_to_asset:%s", hostname), assetID, 0)
+			ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:hostname_to_asset:%s", hostname), assetID, 0)
 		}
 	}
 
 	return assetID
 }
 
-// removeIPFromAsset removes an IP from an asset's known IP set in Redis
+// removeIPFromAsset removes an IP from an asset's known IP set in the state store
 // Caller must hold ir.mu lock.
 func (ir *IdentityResolver) removeIPFromAsset(assetID, ip string) {
-	if ir.redis != nil {
+	if ir.store != nil {
 		ctx := context.Background()
-		ir.redis.SRem(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
+		ir.store.SRem(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
 	}
 }
 
@@ -290,8 +290,8 @@ func (ir *IdentityResolver) ResolveIP(ip string) *AssetIdentity {
 			return identity
 		}
 		ir.mu.RUnlock()
-		// Try Redis fallback
-		identity := ir.resolveIPFromRedis(ip)
+		// Try store fallback
+		identity := ir.resolveIPFromStore(ip)
 		if identity != nil {
 			ir.mu.Lock()
 			ir.resolveHits++
@@ -336,20 +336,20 @@ func (ir *IdentityResolver) ResolveIP(ip string) *AssetIdentity {
 	return identity
 }
 
-// resolveIPFromRedis attempts to resolve an IP via Redis when the in-memory cache misses.
+// resolveIPFromStore attempts to resolve an IP via state store when the in-memory cache misses.
 // If successful, it populates the in-memory cache for future lookups.
-func (ir *IdentityResolver) resolveIPFromRedis(ip string) *AssetIdentity {
-	if ir.redis == nil {
+func (ir *IdentityResolver) resolveIPFromStore(ip string) *AssetIdentity {
+	if ir.store == nil {
 		return nil
 	}
 
 	ctx := context.Background()
 
 	// IP → MAC
-	mac, err := ir.redis.client.Get(ctx, fmt.Sprintf("ndr:assets:ip_to_mac:%s", ip)).Result()
+	mac, err := ir.store.client.Get(ctx, fmt.Sprintf("ndr:assets:ip_to_mac:%s", ip)).Result()
 	if err != nil || mac == "" {
 		// Fallback: IP → asset_id for unresolved non-DHCP hosts.
-		assetID, ferr := ir.redis.client.Get(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip)).Result()
+		assetID, ferr := ir.store.client.Get(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip)).Result()
 		if ferr != nil || assetID == "" {
 			return nil
 		}
@@ -366,7 +366,7 @@ func (ir *IdentityResolver) resolveIPFromRedis(ip string) *AssetIdentity {
 	}
 
 	// MAC → asset_id
-	assetID, err := ir.redis.client.Get(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac)).Result()
+	assetID, err := ir.store.client.Get(ctx, fmt.Sprintf("ndr:assets:mac_to_asset:%s", mac)).Result()
 	if err != nil || assetID == "" {
 		return nil
 	}
@@ -387,8 +387,8 @@ func (ir *IdentityResolver) resolveIPFromRedis(ip string) *AssetIdentity {
 	}
 	ir.mu.Unlock()
 
-	// Try to get asset_type from Redis profile
-	assetType, err := ir.redis.client.HGet(ctx, fmt.Sprintf("ndr:assets:profile:%s", assetID), "asset_type").Result()
+	// Try to get asset_type from state store profile
+	assetType, err := ir.store.client.HGet(ctx, fmt.Sprintf("ndr:assets:profile:%s", assetID), "asset_type").Result()
 	if err == nil && assetType != "" {
 		ir.mu.Lock()
 		identity.AssetType = assetType
@@ -478,17 +478,17 @@ func (ir *IdentityResolver) GetOrCreateAssetIDForIP(ip string) string {
 	}
 
 	var assetID string
-	if ir.redis != nil {
+	if ir.store != nil {
 		ctx := context.Background()
-		counter, err := ir.redis.client.Incr(ctx, "ndr:assets:counter").Result()
+		counter, err := ir.store.client.Incr(ctx, "ndr:assets:counter").Result()
 		if err != nil {
 			assetID = uuid.New().String()
 		} else {
 			assetID = fmt.Sprintf("AST-%04d", counter)
 		}
 
-		ir.redis.client.Set(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip), assetID, 0)
-		ir.redis.SAdd(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
+		ir.store.client.Set(ctx, fmt.Sprintf("ndr:assets:ip_to_asset:%s", ip), assetID, 0)
+		ir.store.SAdd(ctx, fmt.Sprintf("ndr:assets:profile:%s:ips", assetID), ip)
 	} else {
 		assetID = uuid.New().String()
 	}

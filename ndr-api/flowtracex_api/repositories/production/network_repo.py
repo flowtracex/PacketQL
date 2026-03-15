@@ -3,9 +3,9 @@ from ..base.network_repo import NetworkRepository
 from datetime import datetime, timezone, timedelta
 
 try:
-    from clients.redis_client import RedisClient
+    from clients.state_store_client import StateStoreClient
 except Exception:
-    RedisClient = None
+    StateStoreClient = None
 
 try:
     from clients.duckdb_client import DuckDBClient
@@ -14,7 +14,7 @@ except Exception:
 
 
 class ProductionNetworkRepository(NetworkRepository):
-    """Production network repo — reads fleet analytics from Redis."""
+    """Production network repo — reads fleet analytics from local state."""
 
     @staticmethod
     def _empty_analytics():
@@ -50,12 +50,12 @@ class ProductionNetworkRepository(NetworkRepository):
             return f"{num / 1e3:.1f} KB"
         return f"{int(num)} B"
 
-    def _get_analytics_from_redis(self):
-        """Read fleet-wide analytics from Redis (written by ndr-baseline)."""
+    def _get_analytics_from_state_store(self):
+        """Read fleet-wide analytics from local state (written by ndr-baseline)."""
         try:
-            if RedisClient is None:
+            if StateStoreClient is None:
                 return None
-            r = RedisClient.get_instance()
+            r = StateStoreClient.get_instance()
             data = r.hgetall("ndr:network:analytics")
             if data:
                 out = {}
@@ -95,7 +95,7 @@ class ProductionNetworkRepository(NetworkRepository):
         return f"{self.INGEST_TIME_TS_EXPR} >= TIMESTAMP '{cutoff.strftime('%Y-%m-%d %H:%M:%S')}'"
 
     def _compute_analytics_from_duckdb(self, window="24h"):
-        """Fallback analytics when baseline Redis cache is missing."""
+        """Fallback analytics when baseline local state cache is missing."""
         analytics = self._empty_analytics()
         if DuckDBClient is None:
             return analytics
@@ -329,7 +329,7 @@ class ProductionNetworkRepository(NetworkRepository):
         return {"nodes": [], "edges": []}
 
     def get_services(self):
-        analytics = self._get_analytics_from_redis()
+        analytics = self._get_analytics_from_state_store()
         if analytics and "services" in analytics:
             return analytics["services"]
         return []
@@ -340,7 +340,7 @@ class ProductionNetworkRepository(NetworkRepository):
     def get_analytics(self, window="24h"):
         # Use pre-computed cache for 24h default view.
         if window in ("24h", "", None):
-            analytics = self._get_analytics_from_redis()
+            analytics = self._get_analytics_from_state_store()
             if analytics:
                 return analytics
         # For non-default windows (or cache miss), compute on-demand.

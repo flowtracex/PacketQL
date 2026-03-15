@@ -9,7 +9,7 @@
     },
     "write": {
         "flush_buffer_mb": 1,
-        "flush_interval_seconds": 60,
+        "flush_interval_seconds": 5,
         "flush_event_count": 1000
     },
     "kafka_consumer": {

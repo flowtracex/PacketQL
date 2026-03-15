@@ -14,7 +14,7 @@ class DuckDBClient:
         return '"' + str(name).replace('"', '""') + '"'
 
     @classmethod
-    def get_connection(cls):
+    def get_connection(cls, parquet_base=None):
         """
         Returns a new connection to DuckDB with Parquet views registered.
         DuckDB connections are not thread-safe, so we return a new one each time.
@@ -27,18 +27,19 @@ class DuckDBClient:
             else:
                 # Use in-memory — we only need Parquet views, no persistent storage needed
                 con = duckdb.connect()
-            cls._register_parquet_views(con)
+            cls._register_parquet_views(con, parquet_base=parquet_base)
             return con
         except Exception as e:
             logger.error(f"DuckDB connection error: {e}")
             return None
 
     @classmethod
-    def _register_parquet_views(cls, con):
+    def _register_parquet_views(cls, con, parquet_base=None):
         """Register Parquet directories as DuckDB views for SQL queries."""
-        parquet_base = getattr(settings, 'PARQUET_DATA_DIR', None)
-        if not parquet_base:
-            parquet_base = os.path.join(settings.DATA_DIR, 'parquet')
+        if parquet_base is None:
+            parquet_base = getattr(settings, 'PARQUET_DATA_DIR', None)
+            if not parquet_base:
+                parquet_base = os.path.join(settings.DATA_DIR, 'parquet')
         
         parquet_base = str(parquet_base)
         if not os.path.isdir(parquet_base):
@@ -60,10 +61,10 @@ class DuckDBClient:
                     logger.debug(f"Skipping view for {entry}: {e}")
 
     @staticmethod
-    def execute_query(query, params=None):
+    def execute_query(query, params=None, parquet_base=None):
         con = None
         try:
-            con = DuckDBClient.get_connection()
+            con = DuckDBClient.get_connection(parquet_base=parquet_base)
             if params:
                 return con.execute(query, params).fetchall()
             return con.execute(query).fetchall()
@@ -75,11 +76,11 @@ class DuckDBClient:
                 con.close()
     
     @staticmethod
-    def execute_df(query, params=None):
+    def execute_df(query, params=None, parquet_base=None):
         """Returns result as Pandas DataFrame"""
         con = None
         try:
-            con = DuckDBClient.get_connection()
+            con = DuckDBClient.get_connection(parquet_base=parquet_base)
             if con is None:
                 return None
             if params:
@@ -93,11 +94,11 @@ class DuckDBClient:
                 con.close()
 
     @staticmethod
-    def execute_dict_rows(query, params=None):
+    def execute_dict_rows(query, params=None, parquet_base=None):
         """Returns result as list of dicts (no numpy/pandas dependency)."""
         con = None
         try:
-            con = DuckDBClient.get_connection()
+            con = DuckDBClient.get_connection(parquet_base=parquet_base)
             if con is None:
                 return []
             if params:
@@ -115,11 +116,12 @@ class DuckDBClient:
                 con.close()
 
     @staticmethod
-    def get_available_tables():
+    def get_available_tables(parquet_base=None):
         """List all Parquet-backed tables/views available."""
-        parquet_base = getattr(settings, 'PARQUET_DATA_DIR', None)
-        if not parquet_base:
-            parquet_base = os.path.join(settings.DATA_DIR, 'parquet')
+        if parquet_base is None:
+            parquet_base = getattr(settings, 'PARQUET_DATA_DIR', None)
+            if not parquet_base:
+                parquet_base = os.path.join(settings.DATA_DIR, 'parquet')
         
         tables = []
         parquet_base = str(parquet_base)

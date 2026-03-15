@@ -1,6 +1,9 @@
 from ..base.log_repo import LogRepository
 from clients.duckdb_client import DuckDBClient
-from clients.redis_client import RedisClient
+from clients.state_store_client import StateStoreClient
+from apps.logs.data_sources import resolve_source
+from django.conf import settings
+from pathlib import Path
 try:
     from clients.kafka_consumer import KafkaLogConsumer
 except ImportError:
@@ -120,22 +123,41 @@ class ProductionLogRepository(LogRepository):
             "top_generators": [],
             "top_dst_ips": [],
             "top_dns_queries": [],
+            "top_http_hosts": [],
+            "top_response_codes": [],
             "hourly_trend": [{"hour": h, "count": 0} for h in range(24)],
+            "alert_trend": [{"hour": h, "alerts": 0} for h in range(24)],
             "daily_trend": [],
             "source_trend": [],
+            "event_distribution": [],
             "ingestion_rate_eps": 0.0,
             "window": window,
             "computed_at": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(),
         }
 
-    def _compute_analytics_from_duckdb(self, window: str) -> dict:
+    def _normalize_analytics_payload(self, payload: dict, window: str) -> dict:
+        base = self._empty_analytics(window)
+        if not isinstance(payload, dict):
+            return base
+        base.update(payload)
+        return base
+
+    def _source_parquet_base(self, source_id: str | None) -> Path | None:
+        data_dir = Path(getattr(settings, "DATA_DIR", Path(".")))
+        ds = resolve_source(data_dir, source_id)
+        if not ds:
+            return None
+        return Path(ds.parquet_dir)
+
+    def _compute_analytics_from_duckdb(self, window: str, source_id: str | None = None) -> dict:
         con = None
         try:
-            available = set(DuckDBClient.get_available_tables() or [])
+            parquet_base = self._source_parquet_base(source_id)
+            available = set(DuckDBClient.get_available_tables(parquet_base=parquet_base) or [])
             if not available:
                 return self._empty_analytics(window)
 
-            con = DuckDBClient.get_connection()
+            con = DuckDBClient.get_connection(parquet_base=parquet_base)
             if con is None:
                 return self._empty_analytics(window)
 
@@ -164,6 +186,11 @@ class ProductionLogRepository(LogRepository):
             payload["source_stats"] = source_stats
             payload["total_events"] = total_events
             payload["active_sources"] = sum(1 for v in source_stats.values() if v > 0)
+            payload["event_distribution"] = [
+                {"source": k, "count": v}
+                for k, v in sorted(source_stats.items(), key=lambda kv: kv[1], reverse=True)
+                if v > 0
+            ]
 
             if "conn" in available:
                 conn_where = _ingest_time_clause(con, "conn", window)
@@ -217,6 +244,32 @@ class ProductionLogRepository(LogRepository):
                 except Exception:
                     payload["top_dns_queries"] = []
 
+            if "http" in available:
+                http_where = _ingest_time_clause(con, "http", window)
+                try:
+                    rows = con.execute(
+                        f"SELECT host, COUNT(*) AS cnt FROM http "
+                        f"WHERE {http_where} AND host IS NOT NULL AND host <> '' AND host <> '-' "
+                        f"GROUP BY 1 ORDER BY 2 DESC LIMIT 10"
+                    ).fetchall()
+                    payload["top_http_hosts"] = [
+                        {"host": str(r[0]), "count": int(r[1] or 0)} for r in rows
+                    ]
+                except Exception:
+                    payload["top_http_hosts"] = []
+
+                try:
+                    rows = con.execute(
+                        f"SELECT CAST(status_code AS VARCHAR) AS code, COUNT(*) AS cnt FROM http "
+                        f"WHERE {http_where} AND status_code IS NOT NULL "
+                        f"GROUP BY 1 ORDER BY 2 DESC LIMIT 10"
+                    ).fetchall()
+                    payload["top_response_codes"] = [
+                        {"code": str(r[0]), "count": int(r[1] or 0)} for r in rows
+                    ]
+                except Exception:
+                    payload["top_response_codes"] = []
+
             # Hourly/source trend always over the latest 24h for chart readability.
             hourly_buckets = {h: 0 for h in range(24)}
             source_trend_buckets = {src: {h: 0 for h in range(24)} for src in ["conn", "dns", "http"]}
@@ -248,6 +301,55 @@ class ProductionLogRepository(LogRepository):
                 }
                 for h in range(24)
             ]
+
+            # Basic SOC-oriented "alert trend" proxy across conn/dns/http.
+            alert_buckets = {h: 0 for h in range(24)}
+            if "conn" in available:
+                try:
+                    rows = con.execute(
+                        f"SELECT HOUR({INGEST_TIME_TS_EXPR}) AS h, COUNT(*) AS cnt "
+                        f"FROM conn WHERE {_ingest_time_clause(con, 'conn', '24h')} "
+                        f"AND conn_state IN ('REJ','S0','RSTO','RSTR') "
+                        f"GROUP BY 1"
+                    ).fetchall()
+                    for hr, cnt in rows:
+                        h = int(hr or 0)
+                        if 0 <= h <= 23:
+                            alert_buckets[h] += int(cnt or 0)
+                except Exception:
+                    pass
+
+            if "dns" in available:
+                try:
+                    rows = con.execute(
+                        f"SELECT HOUR({INGEST_TIME_TS_EXPR}) AS h, COUNT(*) AS cnt "
+                        f"FROM dns WHERE {_ingest_time_clause(con, 'dns', '24h')} "
+                        f"AND UPPER(COALESCE(rcode_name, '')) = 'NXDOMAIN' "
+                        f"GROUP BY 1"
+                    ).fetchall()
+                    for hr, cnt in rows:
+                        h = int(hr or 0)
+                        if 0 <= h <= 23:
+                            alert_buckets[h] += int(cnt or 0)
+                except Exception:
+                    pass
+
+            if "http" in available:
+                try:
+                    rows = con.execute(
+                        f"SELECT HOUR({INGEST_TIME_TS_EXPR}) AS h, COUNT(*) AS cnt "
+                        f"FROM http WHERE {_ingest_time_clause(con, 'http', '24h')} "
+                        f"AND TRY_CAST(status_code AS INTEGER) >= 400 "
+                        f"GROUP BY 1"
+                    ).fetchall()
+                    for hr, cnt in rows:
+                        h = int(hr or 0)
+                        if 0 <= h <= 23:
+                            alert_buckets[h] += int(cnt or 0)
+                except Exception:
+                    pass
+
+            payload["alert_trend"] = [{"hour": h, "alerts": alert_buckets[h]} for h in range(24)]
 
             # Daily trend (up to 30 days)
             daily_hours = WINDOW_HOURS.get(window)
@@ -293,6 +395,7 @@ class ProductionLogRepository(LogRepository):
     def search_logs(self, filters, page=1, limit=10):
         con = None
         try:
+            source_id = (filters.get('source_id', '') or '').strip()
             source  = (filters.get('source',  '') or '').strip().lower()
             search  = (filters.get('search',  '') or '').strip()
             # Default to bounded lookback; unbounded scans are too expensive at scale.
@@ -301,24 +404,20 @@ class ProductionLogRepository(LogRepository):
             # Format: list of {"field": "src_ip", "operator": "==", "value": "10.0.5.1"}
             conditions = filters.get('conditions', []) or []
 
-            available_tables = DuckDBClient.get_available_tables()
+            parquet_base = self._source_parquet_base(source_id)
+            available_tables = DuckDBClient.get_available_tables(parquet_base=parquet_base) or []
 
             if source and source in available_tables:
                 tables = [source]
             else:
-                # Default to conn for responsive "all logs" landing view.
-                tables = [t for t in ['conn'] if t in available_tables]
-                if not tables:
-                    tables = available_tables[:3]
-
-            # ── Search clause ──────────────────────────────────────────
-            where_clauses = []
-            if search:
-                se = search.replace("'", "''")
-                where_clauses.append(
-                    f"(CAST(src_ip AS VARCHAR) ILIKE '%{se}%' "
-                    f"OR CAST(dst_ip AS VARCHAR) ILIKE '%{se}%')"
-                )
+                # All logs by default, with stable source ordering.
+                preferred = [
+                    "conn", "dns", "http", "ssl", "ssh", "smtp", "dhcp", "ftp",
+                    "rdp", "smb_files", "kerberos", "ntlm", "dce_rpc", "snmp",
+                    "sip", "tunnel", "radius", "smb_mapping",
+                ]
+                tables = [t for t in preferred if t in available_tables]
+                tables += [t for t in available_tables if t not in tables]
 
             # ── Structured query builder conditions ────────────────────
             OP_MAP = {
@@ -332,22 +431,6 @@ class ProductionLogRepository(LogRepository):
                 "starts":   "ILIKE",
                 "ends":     "ILIKE",
             }
-            for cond in conditions:
-                field = cond.get("field", "").strip()
-                op    = cond.get("operator", "==")
-                val   = cond.get("value", "").strip().replace("'", "''")
-                if not field or not val or not _is_safe_field_name(field):
-                    continue
-                sql_op = OP_MAP.get(op, "=")
-                if op == "contains":
-                    val = f"%{val}%"
-                elif op == "starts":
-                    val = f"{val}%"
-                elif op == "ends":
-                    val = f"%{val}"
-                where_clauses.append(f"CAST({field} AS VARCHAR) {sql_op} '{val}'")
-
-            static_where = " AND ".join(where_clauses) if where_clauses else "1=1"
             # Short-lived cache to avoid repeated scans from UI polling/filter toggles.
             cache_key = hashlib.sha1(
                 json.dumps(
@@ -358,6 +441,7 @@ class ProductionLogRepository(LogRepository):
                         "conditions": conditions,
                         "page": page,
                         "limit": limit,
+                        "source_id": source_id,
                     },
                     sort_keys=True,
                     default=str,
@@ -369,7 +453,7 @@ class ProductionLogRepository(LogRepository):
                 if entry and (now - entry["ts"]) <= _SEARCH_CACHE_TTL_SEC:
                     return entry["value"]
 
-            con = DuckDBClient.get_connection()
+            con = DuckDBClient.get_connection(parquet_base=parquet_base)
             if con is None:
                 return {"logs": [], "total": 0, "page": 1, "page_count": 0}
 
@@ -382,6 +466,44 @@ class ProductionLogRepository(LogRepository):
 
             for t in tables:
                 time_clause = _ingest_time_clause(con, t, window)
+                dynamic_where = []
+
+                try:
+                    cols = con.execute(f"DESCRIBE {t}").fetchall()
+                    table_columns = {str(r[0]).strip().lower() for r in cols}
+                except Exception:
+                    table_columns = set()
+
+                if search:
+                    se = search.replace("'", "''")
+                    searchable_candidates = [
+                        "src_ip", "dst_ip", "source_ip", "destination_ip",
+                        "query", "host", "uri", "method", "status_code",
+                        "protocol", "service", "conn_state", "id.orig_h", "id.resp_h",
+                    ]
+                    searchable = [c for c in searchable_candidates if c.lower() in table_columns and _is_safe_field_name(c)]
+                    if searchable:
+                        ors = [f"CAST({c} AS VARCHAR) ILIKE '%{se}%'" for c in searchable]
+                        dynamic_where.append("(" + " OR ".join(ors) + ")")
+
+                for cond in conditions:
+                    field = cond.get("field", "").strip()
+                    op = cond.get("operator", "==")
+                    val = cond.get("value", "").strip().replace("'", "''")
+                    if not field or not val or not _is_safe_field_name(field):
+                        continue
+                    if field.lower() not in table_columns:
+                        continue
+                    sql_op = OP_MAP.get(op, "=")
+                    if op == "contains":
+                        val = f"%{val}%"
+                    elif op == "starts":
+                        val = f"{val}%"
+                    elif op == "ends":
+                        val = f"%{val}"
+                    dynamic_where.append(f"CAST({field} AS VARCHAR) {sql_op} '{val}'")
+
+                static_where = " AND ".join(dynamic_where) if dynamic_where else "1=1"
                 where = f"{time_clause} AND ({static_where})"
                 if needs_exact_count:
                     try:
@@ -434,46 +556,62 @@ class ProductionLogRepository(LogRepository):
                 except Exception:
                     pass
 
-    def get_analytics(self, window="24h"):
+    def get_analytics(self, window="24h", source_id=None):
         """
         Returns log analytics for the given time window.
         Reads from ndr:logs:analytics:{window} (pre-computed by ndr-baseline).
         On cache miss, returns stale sibling window cache (24h/all) or fast empty payload.
         """
         try:
-            # ── Primary: read pre-computed Redis key ───────────────────
-            key = f"ndr:logs:analytics:{window}"
-            cached = RedisClient.get(key)
+            data_dir = Path(getattr(settings, "DATA_DIR", Path(".")))
+            if not source_id:
+                ds = resolve_source(data_dir, None)
+                source_id = ds.source_id if ds else None
+            ds = resolve_source(data_dir, source_id)
+            processing_live = bool(ds and str(ds.ingest_status).lower() == "processing")
+
+            # During chunked ingest, serve LIVE analytics from DuckDB (no local state cache),
+            # so dashboards update incrementally instead of showing stale zeros.
+            if processing_live:
+                payload = self._compute_analytics_from_duckdb(window, source_id=source_id)
+                payload["cache_miss"] = True
+                payload["stale_fallback"] = False
+                payload["live_processing"] = True
+                return self._normalize_analytics_payload(payload, window)
+            # ── Primary: read pre-computed state key ───────────────────
+            key = f"ndr:logs:analytics:{source_id or 'current'}:{window}"
+            cached = StateStoreClient.get(key)
             if cached:
-                return json.loads(cached)
+                return self._normalize_analytics_payload(json.loads(cached), window)
 
             # ── Primary fallback: compute requested window from DuckDB and cache briefly ──
             logger.warning(f"Cache miss for {key} — computing on-demand from DuckDB")
-            payload = self._compute_analytics_from_duckdb(window)
+            payload = self._compute_analytics_from_duckdb(window, source_id=source_id)
             # For cache_miss visibility, keep the flag even when compute succeeds.
             payload["cache_miss"] = True
             payload["stale_fallback"] = False
             try:
-                RedisClient.set(key, json.dumps(payload), ex=120)
+                StateStoreClient.set(key, json.dumps(payload), ex=120)
             except Exception:
                 pass
+            payload = self._normalize_analytics_payload(payload, window)
             if payload.get("total_events", 0) > 0:
                 return payload
 
             # ── Secondary stale fallback: use sibling window cache if available ─────────
             fallback_windows = ["24h", "all"] if window not in ("24h", "all") else ["all"]
             for fw in fallback_windows:
-                fk = f"ndr:logs:analytics:{fw}"
-                fcached = RedisClient.get(fk)
+                fk = f"ndr:logs:analytics:{source_id or 'current'}:{fw}"
+                fcached = StateStoreClient.get(fk)
                 if fcached:
                     stale_payload = json.loads(fcached)
                     stale_payload["window_requested"] = window
                     stale_payload["window_served"] = fw
                     stale_payload["cache_miss"] = True
                     stale_payload["stale_fallback"] = True
-                    return stale_payload
+                    return self._normalize_analytics_payload(stale_payload, window)
 
-            return payload
+            return self._normalize_analytics_payload(payload, window)
 
         except Exception as e:
             logger.error(f"Error getting analytics: {e}")

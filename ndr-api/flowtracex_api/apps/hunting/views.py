@@ -95,18 +95,23 @@ class LogEntryLookupView(APIView):
 
     def get(self, request, uid):
         from clients.duckdb_client import DuckDBClient
+        from apps.logs.data_sources import resolve_source
+        from django.conf import settings
+        from pathlib import Path
         import math, datetime
 
-        tables = DuckDBClient.get_available_tables()
+        ds = resolve_source(Path(getattr(settings, "DATA_DIR", Path("."))), request.query_params.get("source_id"))
+        parquet_base = Path(ds.parquet_dir) if ds else None
+        tables = DuckDBClient.get_available_tables(parquet_base=parquet_base)
         for table in tables:
             try:
                 table_ref = '"' + str(table).replace('"', '""') + '"'
                 rows = DuckDBClient.execute_query(
-                    f"SELECT * FROM {table_ref} WHERE uid = ? LIMIT 1", [uid]
+                    f"SELECT * FROM {table_ref} WHERE uid = ? LIMIT 1", [uid], parquet_base=parquet_base
                 )
                 if rows and len(rows) > 0:
                     # Get column names
-                    cols = DuckDBClient.execute_query(f"DESCRIBE {table_ref}")
+                    cols = DuckDBClient.execute_query(f"DESCRIBE {table_ref}", parquet_base=parquet_base)
                     col_names = [c[0] for c in cols]
                     row = rows[0]
                     entry = {}

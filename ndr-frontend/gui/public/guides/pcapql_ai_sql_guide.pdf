@@ -1,0 +1,742 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R] /Count 10 >>
+endobj
+3 0 obj
+<< /Length 2797 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (PCAPQL AI SQL Assistant Guide) Tj
+1 0 0 1 42 748 Tm () Tj
+1 0 0 1 42 736 Tm (Workflow:) Tj
+1 0 0 1 42 724 Tm (1. Upload this PDF to ChatGPT \(or another AI assistant\).) Tj
+1 0 0 1 42 712 Tm (2. Ask for DuckDB SQL using ONLY the schema in this file.) Tj
+1 0 0 1 42 700 Tm (3. Paste SQL into PCAPQL SQL Query page and run.) Tj
+1 0 0 1 42 688 Tm (4. Start with LIMIT for initial validation.) Tj
+1 0 0 1 42 676 Tm () Tj
+1 0 0 1 42 664 Tm (Prompt Template:) Tj
+1 0 0 1 42 652 Tm (You are a SOC SQL assistant for DuckDB. Use only this schema.) Tj
+1 0 0 1 42 640 Tm (Task: <detection objective>. Return SQL + short explanation.) Tj
+1 0 0 1 42 628 Tm () Tj
+1 0 0 1 42 616 Tm (Schema:) Tj
+1 0 0 1 42 604 Tm () Tj
+1 0 0 1 42 592 Tm (TABLE conn) Tj
+1 0 0 1 42 580 Tm (  - conn_state VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 532 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 520 Tm (  - duration DOUBLE) Tj
+1 0 0 1 42 508 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 484 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 472 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 460 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 448 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 436 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 424 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 412 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - history VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 376 Tm (  - ip_proto INTEGER) Tj
+1 0 0 1 42 364 Tm (  - local_orig BOOLEAN) Tj
+1 0 0 1 42 352 Tm (  - local_resp BOOLEAN) Tj
+1 0 0 1 42 340 Tm (  - missed_bytes BIGINT) Tj
+1 0 0 1 42 328 Tm (  - orig_bytes BIGINT) Tj
+1 0 0 1 42 316 Tm (  - orig_ip_bytes BIGINT) Tj
+1 0 0 1 42 304 Tm (  - orig_pkts BIGINT) Tj
+1 0 0 1 42 292 Tm (  - protocol VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - resp_bytes BIGINT) Tj
+1 0 0 1 42 268 Tm (  - resp_ip_bytes BIGINT) Tj
+1 0 0 1 42 256 Tm (  - resp_pkts BIGINT) Tj
+1 0 0 1 42 244 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 208 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 196 Tm (  - tunnel_parents VARCHAR) Tj
+1 0 0 1 42 184 Tm () Tj
+1 0 0 1 42 172 Tm (TABLE dce_rpc) Tj
+1 0 0 1 42 160 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 148 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 136 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 124 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 112 Tm (  - endpoint VARCHAR) Tj
+1 0 0 1 42 100 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 88 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 76 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 64 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 52 Tm (  - event_time BIGINT) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Length 2635 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 748 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 736 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 724 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 700 Tm (  - named_pipe VARCHAR) Tj
+1 0 0 1 42 688 Tm (  - operation VARCHAR) Tj
+1 0 0 1 42 676 Tm (  - rtt DOUBLE) Tj
+1 0 0 1 42 664 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 640 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 628 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 616 Tm () Tj
+1 0 0 1 42 604 Tm (TABLE dhcp) Tj
+1 0 0 1 42 592 Tm (  - assigned_addr VARCHAR) Tj
+1 0 0 1 42 580 Tm (  - client_addr VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - client_fqdn VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - client_message VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - domain VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - duration DOUBLE) Tj
+1 0 0 1 42 520 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 508 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 496 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 484 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 472 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 460 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 448 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 436 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 424 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 412 Tm (  - host_name VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - id_orig_h VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 376 Tm (  - id_resp_h VARCHAR) Tj
+1 0 0 1 42 364 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 352 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 340 Tm (  - lease_time INTEGER) Tj
+1 0 0 1 42 328 Tm (  - mac VARCHAR) Tj
+1 0 0 1 42 316 Tm (  - msg_types VARCHAR) Tj
+1 0 0 1 42 304 Tm (  - requested_addr VARCHAR) Tj
+1 0 0 1 42 292 Tm (  - server_addr VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - server_message VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - uids VARCHAR) Tj
+1 0 0 1 42 256 Tm () Tj
+1 0 0 1 42 244 Tm (TABLE dns) Tj
+1 0 0 1 42 232 Tm (  - AA BOOLEAN) Tj
+1 0 0 1 42 220 Tm (  - RA BOOLEAN) Tj
+1 0 0 1 42 208 Tm (  - RD BOOLEAN) Tj
+1 0 0 1 42 196 Tm (  - TC BOOLEAN) Tj
+1 0 0 1 42 184 Tm (  - TTLs VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - Z INTEGER) Tj
+1 0 0 1 42 160 Tm (  - answers VARCHAR) Tj
+1 0 0 1 42 148 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 136 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 124 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 112 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 100 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 88 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 76 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 64 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 52 Tm (  - event_type VARCHAR) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2684 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 748 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 736 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 724 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 712 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 700 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 688 Tm (  - protocol VARCHAR) Tj
+1 0 0 1 42 676 Tm (  - qclass INTEGER) Tj
+1 0 0 1 42 664 Tm (  - qclass_name VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - qtype INTEGER) Tj
+1 0 0 1 42 640 Tm (  - qtype_name VARCHAR) Tj
+1 0 0 1 42 628 Tm (  - query VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - rcode INTEGER) Tj
+1 0 0 1 42 604 Tm (  - rcode_name VARCHAR) Tj
+1 0 0 1 42 592 Tm (  - rejected BOOLEAN) Tj
+1 0 0 1 42 580 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 544 Tm (  - trans_id INTEGER) Tj
+1 0 0 1 42 532 Tm () Tj
+1 0 0 1 42 520 Tm (TABLE ftp) Tj
+1 0 0 1 42 508 Tm (  - arg VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - command VARCHAR) Tj
+1 0 0 1 42 484 Tm (  - data_channel_orig_h VARCHAR) Tj
+1 0 0 1 42 472 Tm (  - data_channel_passive BOOLEAN) Tj
+1 0 0 1 42 460 Tm (  - data_channel_resp_h VARCHAR) Tj
+1 0 0 1 42 448 Tm (  - data_channel_resp_p INTEGER) Tj
+1 0 0 1 42 436 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 424 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 412 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 400 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 388 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 364 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 352 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 340 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 328 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 316 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 304 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 292 Tm (  - file_size INTEGER) Tj
+1 0 0 1 42 280 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - fuid VARCHAR) Tj
+1 0 0 1 42 256 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 244 Tm (  - mime_type VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - password VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - reply_code INTEGER) Tj
+1 0 0 1 42 208 Tm (  - reply_msg VARCHAR) Tj
+1 0 0 1 42 196 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 184 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 160 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 148 Tm (  - user VARCHAR) Tj
+1 0 0 1 42 136 Tm () Tj
+1 0 0 1 42 124 Tm (TABLE http) Tj
+1 0 0 1 42 112 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 100 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 88 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 76 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 64 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 52 Tm (  - event_day INTEGER) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2729 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 748 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 736 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 724 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 700 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 688 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 676 Tm (  - host VARCHAR) Tj
+1 0 0 1 42 664 Tm (  - info_code INTEGER) Tj
+1 0 0 1 42 652 Tm (  - info_msg VARCHAR) Tj
+1 0 0 1 42 640 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 628 Tm (  - method VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - orig_filenames VARCHAR) Tj
+1 0 0 1 42 604 Tm (  - orig_fuids VARCHAR) Tj
+1 0 0 1 42 592 Tm (  - orig_mime_types VARCHAR) Tj
+1 0 0 1 42 580 Tm (  - origin VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - password VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - proxied VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - referrer VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - request_body_len INTEGER) Tj
+1 0 0 1 42 520 Tm (  - resp_filenames VARCHAR) Tj
+1 0 0 1 42 508 Tm (  - resp_fuids VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - resp_mime_types VARCHAR) Tj
+1 0 0 1 42 484 Tm (  - response_body_len INTEGER) Tj
+1 0 0 1 42 472 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 460 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 448 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 436 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 424 Tm (  - status_code INTEGER) Tj
+1 0 0 1 42 412 Tm (  - status_msg VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - tags VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - trans_depth INTEGER) Tj
+1 0 0 1 42 376 Tm (  - uri VARCHAR) Tj
+1 0 0 1 42 364 Tm (  - user_agent VARCHAR) Tj
+1 0 0 1 42 352 Tm (  - username VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - version VARCHAR) Tj
+1 0 0 1 42 328 Tm () Tj
+1 0 0 1 42 316 Tm (TABLE kerberos) Tj
+1 0 0 1 42 304 Tm (  - cipher VARCHAR) Tj
+1 0 0 1 42 292 Tm (  - client VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - client_cert_fuid VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - client_cert_subject VARCHAR) Tj
+1 0 0 1 42 256 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 244 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 220 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 208 Tm (  - error_msg VARCHAR) Tj
+1 0 0 1 42 196 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 184 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 172 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 160 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 148 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 136 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 124 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 112 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 100 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 88 Tm (  - forwardable BOOLEAN) Tj
+1 0 0 1 42 76 Tm (  - from DOUBLE) Tj
+1 0 0 1 42 64 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 52 Tm (  - renewable BOOLEAN) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2727 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - request_type VARCHAR) Tj
+1 0 0 1 42 748 Tm (  - server_cert_fuid VARCHAR) Tj
+1 0 0 1 42 736 Tm (  - server_cert_subject VARCHAR) Tj
+1 0 0 1 42 724 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 700 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 688 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 676 Tm (  - success BOOLEAN) Tj
+1 0 0 1 42 664 Tm (  - till DOUBLE) Tj
+1 0 0 1 42 652 Tm () Tj
+1 0 0 1 42 640 Tm (TABLE ntlm) Tj
+1 0 0 1 42 628 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - domainname VARCHAR) Tj
+1 0 0 1 42 604 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 592 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 580 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 556 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 544 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 532 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 520 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 508 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 496 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 484 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 472 Tm (  - hostname VARCHAR) Tj
+1 0 0 1 42 460 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 448 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 436 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 424 Tm (  - server_dns_computer_name VARCHAR) Tj
+1 0 0 1 42 412 Tm (  - server_nb_computer_name VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - server_tree_name VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 364 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 352 Tm (  - success BOOLEAN) Tj
+1 0 0 1 42 340 Tm (  - username VARCHAR) Tj
+1 0 0 1 42 328 Tm () Tj
+1 0 0 1 42 316 Tm (TABLE radius) Tj
+1 0 0 1 42 304 Tm (  - connect_info VARCHAR) Tj
+1 0 0 1 42 292 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 256 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 244 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 220 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 208 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 196 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 184 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 160 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 148 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 136 Tm (  - framed_addr VARCHAR) Tj
+1 0 0 1 42 124 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 112 Tm (  - mac VARCHAR) Tj
+1 0 0 1 42 100 Tm (  - reply_msg VARCHAR) Tj
+1 0 0 1 42 88 Tm (  - result VARCHAR) Tj
+1 0 0 1 42 76 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 64 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 52 Tm (  - src_ip_is_private BOOLEAN) Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2730 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 748 Tm (  - ttl INTEGER) Tj
+1 0 0 1 42 736 Tm (  - tunnel_client VARCHAR) Tj
+1 0 0 1 42 724 Tm (  - username VARCHAR) Tj
+1 0 0 1 42 712 Tm () Tj
+1 0 0 1 42 700 Tm (TABLE rdp) Tj
+1 0 0 1 42 688 Tm (  - cert_count INTEGER) Tj
+1 0 0 1 42 676 Tm (  - cert_permanent BOOLEAN) Tj
+1 0 0 1 42 664 Tm (  - cert_type VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - client_build VARCHAR) Tj
+1 0 0 1 42 640 Tm (  - client_dig_product_id VARCHAR) Tj
+1 0 0 1 42 628 Tm (  - client_name VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - cookie VARCHAR) Tj
+1 0 0 1 42 604 Tm (  - desktop_height INTEGER) Tj
+1 0 0 1 42 592 Tm (  - desktop_width INTEGER) Tj
+1 0 0 1 42 580 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 544 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 532 Tm (  - encryption_level VARCHAR) Tj
+1 0 0 1 42 520 Tm (  - encryption_method VARCHAR) Tj
+1 0 0 1 42 508 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 484 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 472 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 460 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 448 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 436 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 424 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 412 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 388 Tm (  - keyboard_layout VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - requested_color_depth VARCHAR) Tj
+1 0 0 1 42 364 Tm (  - result VARCHAR) Tj
+1 0 0 1 42 352 Tm (  - security_protocol VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 328 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 316 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 304 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 292 Tm () Tj
+1 0 0 1 42 280 Tm (TABLE sip) Tj
+1 0 0 1 42 268 Tm (  - call_id VARCHAR) Tj
+1 0 0 1 42 256 Tm (  - content_type VARCHAR) Tj
+1 0 0 1 42 244 Tm (  - date VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 208 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 196 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 184 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 160 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 148 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 136 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 124 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 112 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 100 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 88 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 76 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 64 Tm (  - method VARCHAR) Tj
+1 0 0 1 42 52 Tm (  - reply_to VARCHAR) Tj
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 2702 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - request_body_len INTEGER) Tj
+1 0 0 1 42 748 Tm (  - request_from VARCHAR) Tj
+1 0 0 1 42 736 Tm (  - request_path VARCHAR) Tj
+1 0 0 1 42 724 Tm (  - request_to VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - response_body_len INTEGER) Tj
+1 0 0 1 42 700 Tm (  - response_from VARCHAR) Tj
+1 0 0 1 42 688 Tm (  - response_path VARCHAR) Tj
+1 0 0 1 42 676 Tm (  - response_to VARCHAR) Tj
+1 0 0 1 42 664 Tm (  - seq VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 640 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 628 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 616 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 604 Tm (  - status_code INTEGER) Tj
+1 0 0 1 42 592 Tm (  - status_msg VARCHAR) Tj
+1 0 0 1 42 580 Tm (  - subject VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - trans_depth INTEGER) Tj
+1 0 0 1 42 556 Tm (  - uri VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - user_agent VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - warning VARCHAR) Tj
+1 0 0 1 42 520 Tm () Tj
+1 0 0 1 42 508 Tm (TABLE smb_files) Tj
+1 0 0 1 42 496 Tm (  - action VARCHAR) Tj
+1 0 0 1 42 484 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 472 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 460 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 448 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 436 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 424 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 412 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 400 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 388 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 364 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 352 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - fuid VARCHAR) Tj
+1 0 0 1 42 328 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 316 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 304 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 292 Tm (  - name VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - path VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - prev_name VARCHAR) Tj
+1 0 0 1 42 256 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 244 Tm (  - size INTEGER) Tj
+1 0 0 1 42 232 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 208 Tm (  - times_accessed DOUBLE) Tj
+1 0 0 1 42 196 Tm (  - times_changed DOUBLE) Tj
+1 0 0 1 42 184 Tm (  - times_created DOUBLE) Tj
+1 0 0 1 42 172 Tm (  - times_modified DOUBLE) Tj
+1 0 0 1 42 160 Tm () Tj
+1 0 0 1 42 148 Tm (TABLE smb_mapping) Tj
+1 0 0 1 42 136 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 124 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 112 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 100 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 88 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 76 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 64 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 52 Tm (  - event_time BIGINT) Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 2649 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 748 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 736 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 724 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 700 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 688 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 676 Tm (  - native_file_system VARCHAR) Tj
+1 0 0 1 42 664 Tm (  - path VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 640 Tm (  - share_type VARCHAR) Tj
+1 0 0 1 42 628 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 604 Tm () Tj
+1 0 0 1 42 592 Tm (TABLE smtp) Tj
+1 0 0 1 42 580 Tm (  - cc VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - date VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 520 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 508 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 484 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 472 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 460 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 448 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 436 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 424 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 412 Tm (  - first_received VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - from VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - fuids VARCHAR) Tj
+1 0 0 1 42 364 Tm (  - helo VARCHAR) Tj
+1 0 0 1 42 352 Tm (  - in_reply_to VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 328 Tm (  - is_webmail BOOLEAN) Tj
+1 0 0 1 42 316 Tm (  - last_reply VARCHAR) Tj
+1 0 0 1 42 304 Tm (  - mailfrom VARCHAR) Tj
+1 0 0 1 42 292 Tm (  - msg_id VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - path VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - rcptto VARCHAR) Tj
+1 0 0 1 42 256 Tm (  - reply_to VARCHAR) Tj
+1 0 0 1 42 244 Tm (  - second_received VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 208 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 196 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 184 Tm (  - subject VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - tls BOOLEAN) Tj
+1 0 0 1 42 160 Tm (  - to VARCHAR) Tj
+1 0 0 1 42 148 Tm (  - trans_depth INTEGER) Tj
+1 0 0 1 42 136 Tm (  - user_agent VARCHAR) Tj
+1 0 0 1 42 124 Tm (  - x_originating_ip VARCHAR) Tj
+1 0 0 1 42 112 Tm () Tj
+1 0 0 1 42 100 Tm (TABLE snmp) Tj
+1 0 0 1 42 88 Tm (  - community VARCHAR) Tj
+1 0 0 1 42 76 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 64 Tm (  - display_string VARCHAR) Tj
+1 0 0 1 42 52 Tm (  - dst_ip VARCHAR) Tj
+ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 2718 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 748 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 736 Tm (  - duration DOUBLE) Tj
+1 0 0 1 42 724 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 700 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 688 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 676 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 664 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 652 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 640 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 628 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 616 Tm (  - get_bulk_requests INTEGER) Tj
+1 0 0 1 42 604 Tm (  - get_requests INTEGER) Tj
+1 0 0 1 42 592 Tm (  - get_responses INTEGER) Tj
+1 0 0 1 42 580 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 568 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 556 Tm (  - set_requests INTEGER) Tj
+1 0 0 1 42 544 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 520 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 508 Tm (  - up_since DOUBLE) Tj
+1 0 0 1 42 496 Tm (  - version VARCHAR) Tj
+1 0 0 1 42 484 Tm () Tj
+1 0 0 1 42 472 Tm (TABLE ssh) Tj
+1 0 0 1 42 460 Tm (  - auth_attempts INTEGER) Tj
+1 0 0 1 42 448 Tm (  - auth_success BOOLEAN) Tj
+1 0 0 1 42 436 Tm (  - cipher_alg VARCHAR) Tj
+1 0 0 1 42 424 Tm (  - client VARCHAR) Tj
+1 0 0 1 42 412 Tm (  - compression_alg VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 376 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 364 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 352 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 328 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 316 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 304 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 292 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 280 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 268 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 256 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 244 Tm (  - host_key VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - host_key_alg VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 208 Tm (  - kex_alg VARCHAR) Tj
+1 0 0 1 42 196 Tm (  - mac_alg VARCHAR) Tj
+1 0 0 1 42 184 Tm (  - server VARCHAR) Tj
+1 0 0 1 42 172 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 160 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 148 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 136 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 124 Tm (  - version INTEGER) Tj
+1 0 0 1 42 112 Tm () Tj
+1 0 0 1 42 100 Tm (TABLE ssl) Tj
+1 0 0 1 42 88 Tm (  - cert_chain_fuids VARCHAR) Tj
+1 0 0 1 42 76 Tm (  - cipher VARCHAR) Tj
+1 0 0 1 42 64 Tm (  - client_cert_chain_fuids VARCHAR) Tj
+1 0 0 1 42 52 Tm (  - client_issuer VARCHAR) Tj
+ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 2284 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 42 760 Tm (  - client_subject VARCHAR) Tj
+1 0 0 1 42 748 Tm (  - curve VARCHAR) Tj
+1 0 0 1 42 736 Tm (  - direction VARCHAR) Tj
+1 0 0 1 42 724 Tm (  - dst_ip VARCHAR) Tj
+1 0 0 1 42 712 Tm (  - dst_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 700 Tm (  - dst_port INTEGER) Tj
+1 0 0 1 42 688 Tm (  - established BOOLEAN) Tj
+1 0 0 1 42 676 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 664 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 652 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 640 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 628 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 616 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 604 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 592 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 580 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 568 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 556 Tm (  - issuer VARCHAR) Tj
+1 0 0 1 42 544 Tm (  - ja3 VARCHAR) Tj
+1 0 0 1 42 532 Tm (  - ja3s VARCHAR) Tj
+1 0 0 1 42 520 Tm (  - last_alert VARCHAR) Tj
+1 0 0 1 42 508 Tm (  - next_protocol VARCHAR) Tj
+1 0 0 1 42 496 Tm (  - resumed BOOLEAN) Tj
+1 0 0 1 42 484 Tm (  - server_name VARCHAR) Tj
+1 0 0 1 42 472 Tm (  - service VARCHAR) Tj
+1 0 0 1 42 460 Tm (  - src_ip VARCHAR) Tj
+1 0 0 1 42 448 Tm (  - src_ip_is_private BOOLEAN) Tj
+1 0 0 1 42 436 Tm (  - src_port INTEGER) Tj
+1 0 0 1 42 424 Tm (  - ssl_history VARCHAR) Tj
+1 0 0 1 42 412 Tm (  - subject VARCHAR) Tj
+1 0 0 1 42 400 Tm (  - validation_status VARCHAR) Tj
+1 0 0 1 42 388 Tm (  - version VARCHAR) Tj
+1 0 0 1 42 376 Tm () Tj
+1 0 0 1 42 364 Tm (TABLE tunnel) Tj
+1 0 0 1 42 352 Tm (  - action VARCHAR) Tj
+1 0 0 1 42 340 Tm (  - event_class VARCHAR) Tj
+1 0 0 1 42 328 Tm (  - event_day INTEGER) Tj
+1 0 0 1 42 316 Tm (  - event_hour INTEGER) Tj
+1 0 0 1 42 304 Tm (  - event_month INTEGER) Tj
+1 0 0 1 42 292 Tm (  - event_time BIGINT) Tj
+1 0 0 1 42 280 Tm (  - event_type VARCHAR) Tj
+1 0 0 1 42 268 Tm (  - event_weekday INTEGER) Tj
+1 0 0 1 42 256 Tm (  - event_year INTEGER) Tj
+1 0 0 1 42 244 Tm (  - flow_id VARCHAR) Tj
+1 0 0 1 42 232 Tm (  - id_orig_h VARCHAR) Tj
+1 0 0 1 42 220 Tm (  - id_orig_p INTEGER) Tj
+1 0 0 1 42 208 Tm (  - id_resp_h VARCHAR) Tj
+1 0 0 1 42 196 Tm (  - id_resp_p INTEGER) Tj
+1 0 0 1 42 184 Tm (  - ingest_time BIGINT) Tj
+1 0 0 1 42 172 Tm (  - tunnel_type VARCHAR) Tj
+1 0 0 1 42 160 Tm () Tj
+ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 21 0 R >>
+endobj
+23 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+xref
+0 24
+0000000000 65535 f 
+0000000009 00000 n 
+0000000077 00000 n 
+0000000196 00000 n 
+0000003045 00000 n 
+0000003171 00000 n 
+0000005858 00000 n 
+0000005984 00000 n 
+0000008720 00000 n 
+0000008846 00000 n 
+0000011627 00000 n 
+0000011754 00000 n 
+0000014534 00000 n 
+0000014662 00000 n 
+0000017445 00000 n 
+0000017573 00000 n 
+0000020328 00000 n 
+0000020456 00000 n 
+0000023158 00000 n 
+0000023286 00000 n 
+0000026057 00000 n 
+0000026185 00000 n 
+0000028522 00000 n 
+0000028650 00000 n 
+trailer
+<< /Size 24 /Root 23 0 R >>
+startxref
+28700
+%%EOF

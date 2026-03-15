@@ -42,7 +42,7 @@
         "ml": 80
     },
     "visibility_score_minimum": 20,
-    "redis_key_prefixes": {
+    "state_key_prefixes": {
         "global": "ndr:global",
         "signal": "ndr:signal",
         "usecase": "ndr:uc",

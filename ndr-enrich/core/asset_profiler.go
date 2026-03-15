@@ -26,7 +26,7 @@ type AssetProfile struct {
 	FirstSeen int64 // epoch ms
 	LastSeen  int64 // epoch ms
 
-	// Dataset-enriched fields (from Redis lookups)
+	// Dataset-enriched fields (from state store lookups)
 	Vendor         string // MAC OUI → vendor name (e.g. "Apple, Inc.")
 	OSHint         string // DHCP fingerprint or JA3 → OS (e.g. "Windows 11")
 	AppFingerprint string // JA3 hash → app name (e.g. "Chrome 120")
@@ -44,7 +44,7 @@ type AssetProfile struct {
 	ConnOut        int64
 	ConnIn         int64
 
-	// Unique peer tracking (Go-side, flush count to Redis)
+	// Unique peer tracking (Go-side, flush count to the state store)
 	uniqueDstIPs map[string]struct{}
 	uniqueSrcIPs map[string]struct{}
 
@@ -54,7 +54,7 @@ type AssetProfile struct {
 // AssetProfiler maintains real-time asset profiles from enriched events
 type AssetProfiler struct {
 	profiles map[string]*AssetProfile // keyed by asset_id (from identity resolver)
-	redis    *RedisClient
+	store    *StateStore
 	resolver *IdentityResolver
 	input    <-chan *EnrichedEvent
 	config   AssetProfilerConfig
@@ -67,10 +67,10 @@ type AssetProfiler struct {
 }
 
 // NewAssetProfiler creates a new asset profiler
-func NewAssetProfiler(cfg AssetProfilerConfig, redisClient *RedisClient, resolver *IdentityResolver, input <-chan *EnrichedEvent) *AssetProfiler {
+func NewAssetProfiler(cfg AssetProfilerConfig, stateStore *StateStore, resolver *IdentityResolver, input <-chan *EnrichedEvent) *AssetProfiler {
 	return &AssetProfiler{
 		profiles: make(map[string]*AssetProfile, 10000),
-		redis:    redisClient,
+		store:    stateStore,
 		resolver: resolver,
 		input:    input,
 		config:   cfg,
@@ -101,15 +101,15 @@ func (ap *AssetProfiler) Start(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			// Final sync on shutdown
-			ap.syncToRedis(ctx)
+			ap.syncToStore(ctx)
 			return nil
 
 		case <-ticker.C:
-			ap.syncToRedis(ctx)
+			ap.syncToStore(ctx)
 
 		case event, ok := <-ap.input:
 			if !ok {
-				ap.syncToRedis(ctx)
+				ap.syncToStore(ctx)
 				return nil
 			}
 			// Process DHCP events for identity registration first
@@ -249,10 +249,10 @@ func (ap *AssetProfiler) extractMetadata(profile *AssetProfile, event *EnrichedE
 		// DHCP gives us MAC + hostname
 		if mac, ok := event.ZeekFields["mac"].(string); ok && mac != "" {
 			profile.MAC = mac
-			// Look up MAC vendor from OUI dataset in Redis
+			// Look up MAC vendor from the local OUI dataset cache
 			if profile.Vendor == "" && len(mac) >= 8 {
 				prefix := mac[:8] // "AA:BB:CC"
-				vendr, err := ap.redis.client.HGet(ctx, "ndr:ds:oui:"+prefix, "vendor").Result()
+				vendr, err := ap.store.client.HGet(ctx, "ndr:ds:oui:"+prefix, "vendor").Result()
 				if err == nil && vendr != "" {
 					profile.Vendor = vendr
 				}
@@ -265,7 +265,7 @@ func (ap *AssetProfiler) extractMetadata(profile *AssetProfile, event *EnrichedE
 	case "ssl":
 		// JA3 fingerprint → app identification
 		if ja3, ok := event.ZeekFields["ja3"].(string); ok && ja3 != "" && profile.AppFingerprint == "" {
-			app, err := ap.redis.client.HGet(ctx, "ndr:ds:ja3:"+ja3, "app").Result()
+			app, err := ap.store.client.HGet(ctx, "ndr:ds:ja3:"+ja3, "app").Result()
 			if err == nil && app != "" {
 				profile.AppFingerprint = app
 			}
@@ -416,8 +416,8 @@ func extractOSFromUA(ua string) string {
 	return ""
 }
 
-// syncToRedis batch writes all dirty profiles to Redis
-func (ap *AssetProfiler) syncToRedis(ctx context.Context) {
+// syncToStore batch writes all dirty profiles to the state store
+func (ap *AssetProfiler) syncToStore(ctx context.Context) {
 	ap.mu.Lock()
 
 	// Count dirty profiles for early exit
@@ -435,8 +435,8 @@ func (ap *AssetProfiler) syncToRedis(ctx context.Context) {
 
 	logger := GetLogger()
 
-	// Batch write using Redis pipeline
-	pipe := ap.redis.Pipeline()
+	// Batch write using state store pipeline
+	pipe := ap.store.Pipeline()
 
 	for profileKey, p := range ap.profiles {
 		if !p.dirty {
@@ -444,7 +444,7 @@ func (ap *AssetProfiler) syncToRedis(ctx context.Context) {
 		}
 		p.dirty = false
 
-		// Use the profile key (asset_id or IP) as the Redis key suffix
+		// Use the profile key (asset_id or IP) as the state store key suffix
 		key := fmt.Sprintf("ndr:assets:profile:%s", profileKey)
 
 		// Classify on every sync
@@ -499,7 +499,7 @@ func (ap *AssetProfiler) syncToRedis(ctx context.Context) {
 	// Execute pipeline
 	_, err := pipe.Exec(ctx)
 	if err != nil {
-		logger.Error("asset_profiler", "redis sync failed", fmt.Sprintf("error=%v profiles=%d", err, dirtyCount))
+		logger.Error("asset_profiler", "state sync failed", fmt.Sprintf("error=%v profiles=%d", err, dirtyCount))
 		ap.mu.Unlock()
 		return
 	}
@@ -507,7 +507,7 @@ func (ap *AssetProfiler) syncToRedis(ctx context.Context) {
 	ap.syncCount++
 	ap.mu.Unlock()
 
-	logger.Info("asset_profiler", fmt.Sprintf("synced %d profiles to Redis", dirtyCount),
+	logger.Info("asset_profiler", fmt.Sprintf("synced %d profiles to the state store", dirtyCount),
 		fmt.Sprintf("total_profiles=%d", dirtyCount))
 }
 

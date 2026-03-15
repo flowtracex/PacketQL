@@ -1,30 +1,20 @@
 import json
 from ..base.network_repo import NetworkRepository
-
-# Try to import Redis client
-try:
-    from clients.redis_client import RedisClient
-    _redis = RedisClient
-except Exception:
-    _redis = None
+from clients.state_store_client import StateStoreClient
 
 
 class DemoNetworkRepository(NetworkRepository):
-    """Network repository that reads from Redis (ndr:network:analytics).
+    """Network repository that reads from local analytics state.
 
-    Falls back to minimal stub data if Redis key doesn't exist.
+    Falls back to minimal stub data if no cached analytics exist.
     Works identically in demo and production — data comes from
     ndr-baseline's network-summary job.
     """
 
-    def _get_analytics_from_redis(self):
-        """Try to read fleet-wide analytics from Redis."""
-        if _redis is None:
-            return None
+    def _get_analytics_from_store(self):
+        """Try to read fleet-wide analytics from local store."""
         try:
-            import redis as redis_lib
-            r = redis_lib.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-            data = r.hgetall("ndr:network:analytics")
+            data = StateStoreClient.hgetall("ndr:network:analytics")
             if data:
                 return {k: json.loads(v) for k, v in data.items()}
         except Exception:
@@ -39,7 +29,7 @@ class DemoNetworkRepository(NetworkRepository):
         ]
 
     def get_services(self):
-        analytics = self._get_analytics_from_redis()
+        analytics = self._get_analytics_from_store()
         if analytics and "services" in analytics:
             return analytics["services"]
         return [
@@ -57,11 +47,11 @@ class DemoNetworkRepository(NetworkRepository):
         }
 
     def get_analytics(self):
-        """Return fleet-wide network analytics from Redis."""
-        analytics = self._get_analytics_from_redis()
+        """Return fleet-wide network analytics from local store."""
+        analytics = self._get_analytics_from_store()
         if analytics:
             return analytics
-        # Fallback if Redis is empty
+        # Fallback if the local cache is empty
         return {
             "kpis": {"total_flows": 0, "total_bytes": 0, "total_bytes_fmt": "0 B", "unique_pairs": 0, "external_pairs": 0, "encryption_pct": 0, "unusual_count": 0},
             "top_talkers_outbound": [],

@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 """
-Demo Mode Bootstrap — Creates SQLite database and Redis seed data
+Demo Mode Bootstrap — creates SQLite demo seed data
 for evaluation/demo environments.
 
 Demo Mode provides a fully populated UI experience without requiring
 live network traffic. When NDR_MODE=demo:
-  - API reads from SQLite (instead of Postgres)
-  - Redis uses DB 15 (isolated from production)
+  - API reads from SQLite
   - Preloaded assets, alerts, signals, risk scores, network flows
 
 Usage:
     python bootstrap_demo.py              # Full bootstrap
     python bootstrap_demo.py --sqlite     # SQLite only
-    python bootstrap_demo.py --redis      # Redis only
     python bootstrap_demo.py --reset      # Drop and recreate everything
 """
 
@@ -96,7 +94,7 @@ DEMO_ASSETS = [
 
     # Docker/Containers (5)
     {"asset_id": "AST-044", "ip": "172.17.0.10", "hostname": "container-nginx",  "asset_type": "docker", "os": "Alpine",  "department": "Engineering"},
-    {"asset_id": "AST-045", "ip": "172.17.0.11", "hostname": "container-redis",  "asset_type": "docker", "os": "Alpine",  "department": "Engineering"},
+    {"asset_id": "AST-045", "ip": "172.17.0.11", "hostname": "container-cache",  "asset_type": "docker", "os": "Alpine",  "department": "Engineering"},
     {"asset_id": "AST-046", "ip": "172.17.0.12", "hostname": "container-api",    "asset_type": "docker", "os": "Debian",  "department": "Engineering"},
     {"asset_id": "AST-047", "ip": "172.17.0.13", "hostname": "container-worker", "asset_type": "docker", "os": "Alpine",  "department": "Engineering"},
     {"asset_id": "AST-048", "ip": "172.17.0.14", "hostname": "container-monitor","asset_type": "docker", "os": "Alpine",  "department": "Engineering"},
@@ -425,124 +423,19 @@ def bootstrap_sqlite(db_path: Path, reset: bool = False):
     return counts
 
 
-# ─── Redis Bootstrap ────────────────────────────────────────────
-
-def bootstrap_redis(reset: bool = False):
-    """Populate Redis DB 15 with demo data."""
-    import redis
-
-    host = os.environ.get("REDIS_HOST", "localhost")
-    port = int(os.environ.get("REDIS_PORT", "6379"))
-    demo_db = 15
-
-    r = redis.Redis(host=host, port=port, db=demo_db, decode_responses=True)
-    r.ping()
-    logger.info(f"Connected to Redis {host}:{port} DB={demo_db}")
-
-    if reset:
-        r.flushdb()
-        logger.info("  Flushed demo Redis DB")
-
-    now = datetime.now(timezone.utc)
-
-    # ── Asset registry ──
-    for asset in DEMO_ASSETS:
-        key = f"ndr:asset:{asset['asset_id']}"
-        r.hset(key, mapping={
-            "ip": asset["ip"],
-            "hostname": asset["hostname"],
-            "asset_type": asset["asset_type"],
-            "os": asset["os"],
-            "department": asset["department"],
-            "risk_score": str(random.randint(5, 85)),
-            "first_seen": (now - timedelta(days=random.randint(14, 90))).isoformat(),
-        })
-        r.set(f"ndr:ip_to_asset:{asset['ip']}", asset["asset_id"])
-    logger.info(f"  {len(DEMO_ASSETS)} assets registered")
-
-    # ── Entity risk scores ──
-    for asset in DEMO_ASSETS:
-        risk = random.randint(5, 85) if random.random() < 0.4 else random.randint(0, 25)
-        r.set(f"ndr:entity_risk:{asset['asset_id']}", str(risk))
-    logger.info(f"  {len(DEMO_ASSETS)} entity risk scores set")
-
-    # ── Dashboard stats ──
-    critical = sum(1 for a in DEMO_ALERTS if a["severity"] == "critical")
-    high = sum(1 for a in DEMO_ALERTS if a["severity"] == "high")
-    medium = sum(1 for a in DEMO_ALERTS if a["severity"] == "medium")
-    low = sum(1 for a in DEMO_ALERTS if a["severity"] == "low")
-    stats = {
-        "total_assets": str(len(DEMO_ASSETS)),
-        "total_alerts": str(len(DEMO_ALERTS)),
-        "critical_alerts": str(critical),
-        "high_alerts": str(high),
-        "medium_alerts": str(medium),
-        "low_alerts": str(low),
-        "open_alerts": str(sum(1 for a in DEMO_ALERTS if a["status"] in ("new", "triaged"))),
-        "resolved_alerts": str(sum(1 for a in DEMO_ALERTS if a["status"] == "resolved")),
-        "false_positive_alerts": str(sum(1 for a in DEMO_ALERTS if a["status"] == "false_positive")),
-        "events_per_second": "1250",
-        "signals_today": "200",
-        "active_signals": "94",
-        "active_use_cases": "31",
-        "updated_at": now.isoformat(),
-    }
-    r.hset("ndr:dashboard:stats", mapping=stats)
-    logger.info("  Dashboard stats populated")
-
-    # ── Recent signals timeline (100 entries) ──
-    for i in range(100):
-        sig_id, severity, category, points = random.choice(SIGNAL_POOL)
-        asset = random.choice(DEMO_ASSETS)
-        ts = (now - timedelta(hours=random.randint(0, 72))).isoformat()
-        sig_data = {
-            "signal_id": sig_id,
-            "asset_id": asset["asset_id"],
-            "asset_ip": asset["ip"],
-            "hostname": asset["hostname"],
-            "severity": severity,
-            "category": category,
-            "scored_points": points,
-            "timestamp": ts,
-        }
-        r.lpush("ndr:recent_signals", json.dumps(sig_data))
-    r.ltrim("ndr:recent_signals", 0, 99)
-    logger.info("  100 recent signals added to timeline")
-
-    # ── Recent alerts feed (30 entries) ──
-    for alert in DEMO_ALERTS:
-        asset = next((a for a in DEMO_ASSETS if a["asset_id"] == alert["asset_id"]), {})
-        ts = (now - timedelta(hours=random.randint(1, 72))).isoformat()
-        alert_data = {
-            **alert,
-            "asset_ip": asset.get("ip", ""),
-            "hostname": asset.get("hostname", ""),
-            "timestamp": ts,
-        }
-        r.lpush("ndr:recent_alerts", json.dumps(alert_data))
-    r.ltrim("ndr:recent_alerts", 0, 49)
-    logger.info(f"  {len(DEMO_ALERTS)} recent alerts added to feed")
-
-    logger.info("  Redis bootstrap complete")
-
-
 # ─── Main ────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="Bootstrap Demo Mode")
     parser.add_argument("--sqlite", action="store_true", help="Bootstrap SQLite only")
-    parser.add_argument("--redis", action="store_true", help="Bootstrap Redis only")
     parser.add_argument("--reset", action="store_true", help="Drop and recreate everything")
     parser.add_argument("--db-path", type=str, default=str(DEMO_DB_PATH), help="SQLite database path")
 
     args = parser.parse_args()
-    do_both = not args.sqlite and not args.redis
+    do_both = not args.sqlite
 
     if do_both or args.sqlite:
         bootstrap_sqlite(Path(args.db_path), reset=args.reset)
-
-    if do_both or args.redis:
-        bootstrap_redis(reset=args.reset)
 
     logger.info("\n✅ Demo Mode bootstrap complete!")
     logger.info(f"   Set NDR_MODE=demo to enable")

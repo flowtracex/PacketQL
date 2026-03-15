@@ -1,9 +1,11 @@
 import React from 'react';
-import { Search, Database, History } from 'lucide-react';
+import { Search, Database, History, Upload, Activity } from 'lucide-react';
 
 export type PageId =
+  | 'pcap-upload'
   | 'logs-search'
-  | 'logs-analytics'
+  | 'logs-dashboard'
+  | 'pipeline-health'
   | 'threat-hunting-builder'
   | 'threat-hunting-history';
 
@@ -14,7 +16,7 @@ interface SidebarProps {
 
 const itemClass = (active: boolean) =>
   `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-    active ? 'bg-[#00D4AA10] text-[#00D4AA]' : 'text-gray-400 hover:text-white hover:bg-white/5'
+    active ? 'bg-[#00D4AA10] text-[#00D4AA] border border-[#00D4AA33]' : 'text-gray-400 hover:text-white hover:bg-white/5'
   }`;
 
 const Sidebar: React.FC<SidebarProps> = ({ activePage, onPageChange }) => {
@@ -23,36 +25,34 @@ const Sidebar: React.FC<SidebarProps> = ({ activePage, onPageChange }) => {
       <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2">PCAPQL</div>
 
-        <button
-          onClick={() => onPageChange('logs-search')}
-          className={itemClass(activePage === 'logs-search')}
-        >
+        <button onClick={() => onPageChange('pcap-upload')} className={itemClass(activePage === 'pcap-upload')}>
+          <Upload size={16} />
+          <span className="font-semibold">PCAP Upload</span>
+        </button>
+
+        <button onClick={() => onPageChange('logs-dashboard')} className={itemClass(activePage === 'logs-dashboard')}>
+          <Database size={16} />
+          <span className="font-semibold">Log Dashboard</span>
+        </button>
+
+        <button onClick={() => onPageChange('logs-search')} className={itemClass(activePage === 'logs-search')}>
           <Search size={16} />
           <span className="font-semibold">Log Search</span>
         </button>
 
-        <button
-          onClick={() => onPageChange('logs-analytics')}
-          className={itemClass(activePage === 'logs-analytics')}
-        >
-          <Database size={16} />
-          <span className="font-semibold">Log Analytics</span>
-        </button>
-
-        <button
-          onClick={() => onPageChange('threat-hunting-builder')}
-          className={itemClass(activePage === 'threat-hunting-builder')}
-        >
+        <button onClick={() => onPageChange('threat-hunting-builder')} className={itemClass(activePage === 'threat-hunting-builder')}>
           <Database size={16} />
           <span className="font-semibold">SQL Query</span>
         </button>
 
-        <button
-          onClick={() => onPageChange('threat-hunting-history')}
-          className={itemClass(activePage === 'threat-hunting-history')}
-        >
+        <button onClick={() => onPageChange('threat-hunting-history')} className={itemClass(activePage === 'threat-hunting-history')}>
           <History size={16} />
           <span className="font-semibold">Saved Queries</span>
+        </button>
+
+        <button onClick={() => onPageChange('pipeline-health')} className={itemClass(activePage === 'pipeline-health')}>
+          <Activity size={16} />
+          <span className="font-semibold">Pipeline Health</span>
         </button>
       </nav>
     </aside>

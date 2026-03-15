@@ -6,6 +6,8 @@
 
 PacketQL is an open-source packet investigation platform that turns PCAP files into SQL-queryable security data.
 
+![Positioning](https://img.shields.io/badge/Positioning-Lighter%20SQL--first%20alternative%20to%20heavy%20PCAP%20investigation%20workflows-0f766e)
+
 Status: **Public Beta**
 
 Recommended deployment: **single Docker container**

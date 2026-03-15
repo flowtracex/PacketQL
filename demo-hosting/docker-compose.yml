@@ -1,6 +1,6 @@
 services:
   packetql:
-    image: ${PACKETQL_IMAGE:-packetql:single-optimized}
+    image: ${PACKETQL_IMAGE:-jobish/packetql:beta}
     container_name: packetql-demo-app
     restart: unless-stopped
     environment:

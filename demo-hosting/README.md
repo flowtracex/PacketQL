@@ -91,13 +91,13 @@ docker compose restart packetql
 By default the compose file uses:
 
 ```text
-packetql:single-optimized
+jobish/packetql:beta
 ```
 
 Override it like this:
 
 ```bash
-PACKETQL_IMAGE=your-dockerhub-org/packetql:latest ./run-demo.sh
+PACKETQL_IMAGE=jobish/packetql:beta ./run-demo.sh
 ```
 
 ## Current Demo Datasets

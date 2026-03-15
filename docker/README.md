@@ -31,10 +31,8 @@ The single-container image bundles:
 
 ## Run From Docker Hub
 
-Replace the image name below with your published Docker Hub tag.
-
 ```bash
-docker pull YOUR_DOCKERHUB_ORG/packetql:latest
+docker pull jobish/packetql:beta
 
 mkdir -p /opt/packetql-data
 
@@ -42,7 +40,8 @@ docker run -d \
   --name packetql \
   -p 3000:3000 \
   -v /opt/packetql-data:/data \
-  YOUR_DOCKERHUB_ORG/packetql:latest
+  -e APP_MODE=demo \
+  jobish/packetql:beta
 ```
 
 Open:
@@ -60,7 +59,8 @@ docker run -d \
   --name packetql \
   -p 8088:3000 \
   -v /opt/packetql-data:/data \
-  YOUR_DOCKERHUB_ORG/packetql:latest
+  -e APP_MODE=demo \
+  jobish/packetql:beta
 ```
 
 Open:

@@ -87,7 +87,7 @@ Run SQL against structured protocol tables and inspect results in the same workf
 After you publish the image, make this the main install path.
 
 ```bash
-docker pull YOUR_DOCKERHUB_ORG/packetql:latest
+docker pull jobish/packetql:beta
 
 mkdir -p /opt/packetql-data
 
@@ -95,7 +95,8 @@ docker run -d \
   --name packetql \
   -p 3000:3000 \
   -v /opt/packetql-data:/data \
-  YOUR_DOCKERHUB_ORG/packetql:latest
+  -e APP_MODE=demo \
+  jobish/packetql:beta
 ```
 
 Open: `http://localhost:3000`
@@ -107,7 +108,8 @@ docker run -d \
   --name packetql \
   -p 8088:3000 \
   -v /opt/packetql-data:/data \
-  YOUR_DOCKERHUB_ORG/packetql:latest
+  -e APP_MODE=demo \
+  jobish/packetql:beta
 ```
 
 Open: `http://localhost:8088`

@@ -36,6 +36,10 @@ Use one of:
 - your live demo URL
 - your Docker Hub package page
 
+Current public package:
+
+- `https://hub.docker.com/r/jobish/packetql`
+
 ## Suggested Topics
 
 ```text
@@ -60,6 +64,9 @@ Recommended workflow:
 - mount one host directory to /data
 - open the UI
 - upload a PCAP
+
+Docker image:
+- jobish/packetql:beta
 
 Recommended PCAP size for the best experience: below 50 MB.
 
@@ -141,8 +148,8 @@ PacketQL is currently in public beta. The recommended deployment path is the bun
 
 Replace placeholders in the docs:
 
-- `YOUR_DOCKERHUB_ORG/packetql:latest`
-- `<your-repo-url>`
+- Docker image references should point to `jobish/packetql:beta`
+- repository URL should point to `https://github.com/flowtracex/PacketQL`
 
 Also confirm:
 

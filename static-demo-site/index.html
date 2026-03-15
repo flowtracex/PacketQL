@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PacketQL Demo</title>
+  <style>
+    :root {
+      --bg: #071017;
+      --panel: #0f1a22;
+      --panel-2: #111822;
+      --line: rgba(120, 173, 214, 0.18);
+      --text: #eef5fb;
+      --muted: #9fb2c3;
+      --accent: #1fd2a0;
+      --accent-2: #38bdf8;
+      --warning: #fbbf24;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 32%),
+        radial-gradient(circle at top right, rgba(31, 210, 160, 0.16), transparent 28%),
+        linear-gradient(180deg, #071017 0%, #09131b 45%, #071017 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 20px 72px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(16, 25, 34, 0.92), rgba(10, 17, 24, 0.94));
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 42px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 18px 0 0;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      margin-top: 34px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17, 24, 34, 0.88), rgba(9, 14, 21, 0.92));
+      border-radius: 22px;
+      padding: 22px;
+    }
+
+    .card h2, .section h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .card p, .section p, .card li {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(31, 210, 160, 0.12);
+      border: 1px solid rgba(31, 210, 160, 0.26);
+      color: #c6ffef;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 8px rgba(31, 210, 160, 0.12);
+    }
+
+    .warning {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(251, 191, 36, 0.18);
+      background: rgba(251, 191, 36, 0.08);
+      color: #fde8a6;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-top: 28px;
+      border: 1px solid var(--line);
+      background: rgba(9, 16, 23, 0.78);
+      border-radius: 26px;
+      padding: 28px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .workflow-step {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(14, 22, 31, 0.95), rgba(10, 16, 23, 0.95));
+      min-height: 132px;
+    }
+
+    .workflow-step strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .workflow-step span {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--accent-2);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .shots {
+      display: grid;
+      gap: 26px;
+      margin-top: 20px;
+    }
+
+    .shot {
+      border: 1px solid var(--line);
+      background: rgba(9, 14, 21, 0.95);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+
+    .shot-copy {
+      padding: 20px 22px 12px;
+    }
+
+    .shot-copy h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .shot img {
+      width: 100%;
+      display: block;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      color: #90a5b7;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .cta-grid,
+      .grid-3,
+      .workflow {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="topbar">
+        <div class="brand">
+          <div class="eyebrow">PacketQL Demo</div>
+          <h1>Packet investigation, simplified.</h1>
+          <p class="subtitle">
+            PacketQL turns PCAP files into structured, SQL-queryable investigation data using Zeek, Kafka, Parquet,
+            and DuckDB. This hosted page is a static product demo showing the real workflow and UI.
+          </p>
+          <div class="pill-row">
+            <div class="pill">PCAP to structured tables</div>
+            <div class="pill">Log dashboard and search</div>
+            <div class="pill">SQL-ready investigation flow</div>
+            <div class="pill">Preloaded sample datasets</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-grid">
+        <div class="card">
+          <div class="status"><span class="dot"></span> Static hosted preview</div>
+          <p>
+            This public demo is intentionally read-only. It is designed to show the PacketQL workflow with curated
+            packet captures and investigation views, without exposing raw upload or destructive runtime operations.
+          </p>
+          <div class="warning">
+            Demo datasets included: <strong>4SICS-GeekLounge-151020.pcap</strong> and <strong>dhcp.pcap</strong>.
+            Recommended live product workflow uses uploaded PCAP files below 50 MB for the smoothest analyst experience.
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>What analysts see</h2>
+          <ul>
+            <li>Upload packet captures into a guided workflow</li>
+            <li>Review normalized protocol tables like <code>conn</code>, <code>dns</code>, and <code>notice</code></li>
+            <li>Search logs with fast pivots</li>
+            <li>Run SQL over structured investigation data</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Architecture Flow</h2>
+      <p>The product pipeline is intentionally simple for analysts, while still using a strong backend processing flow.</p>
+      <div class="workflow">
+        <div class="workflow-step"><span>Step 1</span><strong>PCAP Upload</strong><p>Users start with a packet capture.</p></div>
+        <div class="workflow-step"><span>Step 2</span><strong>Zeek</strong><p>Zeek parses traffic into protocol-specific logs.</p></div>
+        <div class="workflow-step"><span>Step 3</span><strong>Kafka</strong><p>Streaming events are buffered through Kafka in KRaft mode.</p></div>
+        <div class="workflow-step"><span>Step 4</span><strong>Go Pipeline</strong><p>Events are normalized and enriched in real time.</p></div>
+        <div class="workflow-step"><span>Step 5</span><strong>Parquet + DuckDB</strong><p>Structured outputs become SQL-queryable investigation data.</p></div>
+        <div class="workflow-step"><span>Step 6</span><strong>UI</strong><p>Analysts investigate with dashboard, search, and SQL.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Core Demo Screens</h2>
+      <p>These screenshots are captured from the actual PacketQL interface and show the core analyst workflow.</p>
+      <div class="shots">
+        <article class="shot">
+          <div class="shot-copy">
+            <h3>PCAP Upload</h3>
+            <p>Upload `.pcap` and `.pcapng` files, see processing status, and move directly into dashboard or search workflows.</p>
+          </div>
+          <img src="assets/pcap-upload.png" alt="PacketQL PCAP upload screen">
+        </article>
+
+        <article class="shot">
+          <div class="shot-copy">
+            <h3>Log Search</h3>
+            <p>Investigators can filter and search normalized data across protocol tables with fast pivots into deeper detail.</p>
+          </div>
+          <img src="assets/log-search.png" alt="PacketQL log search screen">
+        </article>
+
+        <article class="shot">
+          <div class="shot-copy">
+            <h3>SQL Query Results</h3>
+            <p>Analysts can run SQL directly against structured investigation data for fast hunting and custom exploration.</p>
+          </div>
+          <img src="assets/sql-query-results.png" alt="PacketQL SQL query results screen">
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Demo Notes</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h2>Read-only presentation</h2>
+          <p>This hosted page is intended as a clean product preview for customers and stakeholders.</p>
+        </div>
+        <div class="card">
+          <h2>Sample datasets</h2>
+          <p>Curated PCAP sources are used to keep the experience stable, predictable, and easy to explain.</p>
+        </div>
+        <div class="card">
+          <h2>Production path</h2>
+          <p>The recommended deployment model for the real product is the bundled Docker workflow described in the GitHub repository.</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      PacketQL static demo for <strong>pcapql.flowtracex.com</strong>
+    </p>
+  </div>
+</body>
+</html>

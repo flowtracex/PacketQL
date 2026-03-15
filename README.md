@@ -1,5 +1,9 @@
 # PacketQL
 
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-jobish%2Fpacketql-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/jobish/packetql)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-packetql.flowtracex.com-0f766e)](https://packetql.flowtracex.com)
+[![GitHub](https://img.shields.io/badge/GitHub-flowtracex%2FPacketQL-111827?logo=github)](https://github.com/flowtracex/PacketQL)
+
 PacketQL is an open-source packet investigation platform that turns PCAP files into SQL-queryable security data.
 
 Status: **Public Beta**

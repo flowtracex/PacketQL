@@ -8,9 +8,10 @@ interface PlatformNavProps {
   onResetData?: () => void;
   onOpenHowItWorks?: () => void;
   onOpenAISQLAssistant?: () => void;
+  readOnlyDemo?: boolean;
 }
 
-const PlatformNav: React.FC<PlatformNavProps> = ({ currentSource, sources = [], onSourceChange, onResetData, onOpenHowItWorks, onOpenAISQLAssistant }) => {
+const PlatformNav: React.FC<PlatformNavProps> = ({ currentSource, sources = [], onSourceChange, onResetData, onOpenHowItWorks, onOpenAISQLAssistant, readOnlyDemo = false }) => {
   return (
     <div className="h-14 bg-[#0f0f10] border-b border-[#242428] flex items-center justify-between px-6 sticky top-0 z-[60]">
       <div className="flex items-center gap-4">
@@ -18,6 +19,11 @@ const PlatformNav: React.FC<PlatformNavProps> = ({ currentSource, sources = [], 
         <span className="text-lg font-extrabold tracking-wide text-white">
           PacketQL
         </span>
+        {readOnlyDemo && (
+          <span className="rounded-full border border-[#38bdf855] bg-[#38bdf810] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7dd3fc]">
+            Public Demo
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

@@ -8,6 +8,7 @@ import json
 import time
 import uuid
 import logging
+import re
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,31 @@ class ProductionHuntingRepository(HuntingRepository):
     Hunts and Results stored in SQLite (Django Models).
     Hunt runs executed via DuckDB against Parquet views.
     """
+
+    @staticmethod
+    def _is_read_only_sql(query: str) -> bool:
+        normalized = (query or "").strip()
+        if not normalized:
+            return False
+        compact = re.sub(r"\s+", " ", normalized).lower()
+        if not re.match(r"^(select|with|explain|describe|show)\b", compact):
+            return False
+        forbidden = (
+            "insert",
+            "update",
+            "delete",
+            "alter",
+            "drop",
+            "create",
+            "attach",
+            "detach",
+            "copy",
+            "export",
+            "install",
+            "load",
+            "call",
+        )
+        return not any(re.search(rf"\b{word}\b", compact) for word in forbidden)
 
     def list_hunts(self, filters, page=1, limit=10):
         try:
@@ -108,6 +134,14 @@ class ProductionHuntingRepository(HuntingRepository):
         
         if query_type == 'sql':
             query = params.get('query', '')
+            if settings.APP_MODE == 'demo' and not self._is_read_only_sql(query):
+                return {
+                    "results": [],
+                    "total": 0,
+                    "executionTime": "0.00s",
+                    "query": query,
+                    "error": "Public demo only allows read-only SQL queries starting with SELECT, WITH, EXPLAIN, DESCRIBE, or SHOW.",
+                }
             # Try to infer log source from query for reasoning (naive check)
             if 'dns' in query.lower(): log_source = 'dns'
             elif 'http' in query.lower(): log_source = 'http'

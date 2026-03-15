@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Play, Save, BookOpen } from 'lucide-react';
 import { huntApi } from '../services/api';
+import { CONFIG } from '../config';
 
 type View = 'builder' | 'history';
 
@@ -28,6 +29,7 @@ const QUERY_LIBRARY = [
 ];
 
 const ThreatHuntingPage: React.FC<{ defaultView?: View; currentSourceId?: string }> = ({ defaultView = 'builder', currentSourceId }) => {
+  const isReadOnlyDemo = CONFIG.APP_MODE === 'demo';
   const [view, setView] = useState<View>(defaultView);
   const [name, setName] = useState('SOC SQL Hunt');
   const [sql, setSql] = useState(QUERY_LIBRARY[0].sql);
@@ -121,10 +123,17 @@ const ThreatHuntingPage: React.FC<{ defaultView?: View; currentSourceId?: string
                 <button onClick={run} disabled={running} className="px-3 py-2 rounded bg-[#00D4AA] text-black text-sm font-bold disabled:opacity-50 inline-flex items-center gap-2">
                   <Play size={14} /> {running ? 'Running...' : 'Run'}
                 </button>
-                <button onClick={save} disabled={saving} className="px-3 py-2 rounded border border-[#00D4AA55] text-[#00D4AA] text-sm font-bold disabled:opacity-50 inline-flex items-center gap-2">
-                  <Save size={14} /> {saving ? 'Saving...' : 'Save'}
-                </button>
+                {!isReadOnlyDemo && (
+                  <button onClick={save} disabled={saving} className="px-3 py-2 rounded border border-[#00D4AA55] text-[#00D4AA] text-sm font-bold disabled:opacity-50 inline-flex items-center gap-2">
+                    <Save size={14} /> {saving ? 'Saving...' : 'Save'}
+                  </button>
+                )}
               </div>
+              {isReadOnlyDemo && (
+                <p className="mb-3 text-xs text-sky-300">
+                  Public demo is read-only. Run investigation queries, but saving or modifying query history is disabled.
+                </p>
+              )}
               <textarea
                 value={sql}
                 onChange={(e) => setSql(e.target.value)}

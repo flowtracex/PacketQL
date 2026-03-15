@@ -44,6 +44,7 @@ const readJsonSafe = async (res: Response) => {
 };
 
 const PcapUploadPage: React.FC<{
+  demoReadOnly?: boolean;
   onUploadComplete?: (source: { source_id: string; name: string; created_at: string }) => void;
   onOpenDashboard?: () => void;
   onOpenLogSearch?: () => void;
@@ -51,7 +52,7 @@ const PcapUploadPage: React.FC<{
   activeIngest?: ActiveIngest | null;
   uploadState?: UploadState;
   onUploadFile?: (file: File) => Promise<any>;
-}> = ({ onUploadComplete, onOpenDashboard, onOpenLogSearch, onOpenTableExplorer, activeIngest, uploadState, onUploadFile }) => {
+}> = ({ demoReadOnly = false, onUploadComplete, onOpenDashboard, onOpenLogSearch, onOpenTableExplorer, activeIngest, uploadState, onUploadFile }) => {
   const [selected, setSelected] = useState<File | null>(null);
   const [files, setFiles] = useState<PcapFile[]>([]);
   const [message, setMessage] = useState<string>('');
@@ -70,7 +71,7 @@ const PcapUploadPage: React.FC<{
   } | null>(null);
   const uploading = !!uploadState?.active;
   const uploadProgress = uploadState?.progress ?? 0;
-  const activeBlocked = (!!activeIngest && String(activeIngest.ingest?.status).toLowerCase() === 'processing') || uploading;
+  const activeBlocked = demoReadOnly || ((!!activeIngest && String(activeIngest.ingest?.status).toLowerCase() === 'processing') || uploading);
 
   const loadFiles = async () => {
     try {
@@ -203,7 +204,7 @@ const PcapUploadPage: React.FC<{
             accept=".pcap,.pcapng"
             disabled={activeBlocked}
             onChange={(e) => setSelected(e.target.files?.[0] || null)}
-            className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#00D4AA] file:text-black hover:file:bg-[#00c09a]"
+            className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#00D4AA] file:text-black hover:file:bg-[#00c09a] disabled:cursor-not-allowed disabled:opacity-60"
           />
           <button
             onClick={upload}
@@ -212,10 +213,16 @@ const PcapUploadPage: React.FC<{
           >
             <span className="inline-flex items-center gap-2">
               <Upload size={14} />
-              {uploading ? 'Uploading...' : 'Upload'}
+              {demoReadOnly ? 'Demo Upload Disabled' : uploading ? 'Uploading...' : 'Upload'}
             </span>
           </button>
         </div>
+
+        {demoReadOnly && (
+          <div className="mt-3 rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-xs text-sky-100">
+            Public demo is read-only. Use the source selector and explore the preloaded datasets instead of uploading new PCAP files.
+          </div>
+        )}
 
         {uploading && (
           <div className="mt-3">
@@ -230,7 +237,7 @@ const PcapUploadPage: React.FC<{
         )}
 
         {message && <p className="mt-3 text-xs text-gray-300">{message}</p>}
-        {activeBlocked && (
+        {!demoReadOnly && activeBlocked && (
           <p className="mt-2 text-xs text-amber-300">
             New upload is locked until current processing finishes: {activeIngest?.source?.name}
           </p>

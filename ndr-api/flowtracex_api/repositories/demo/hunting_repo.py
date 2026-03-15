@@ -28,9 +28,7 @@ class DemoHuntingRepository(HuntingRepository):
         }
 
     def save_hunt(self, data, user):
-        author = user if hasattr(user, 'pk') and user.pk else None
-        hunt = Hunt.objects.create(author=author, **data)
-        return HuntSerializer(hunt).data
+        return None
 
     def get_hunt(self, hunt_id):
         try:
@@ -49,7 +47,7 @@ class DemoHuntingRepository(HuntingRepository):
         return self._prod().get_hunt_run_result(run_id)
 
     def delete_hunt(self, hunt_id):
-        return self._prod().delete_hunt(hunt_id)
+        return False
 
     def get_categories(self):
         return self._prod().get_categories()

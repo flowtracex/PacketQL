@@ -11,6 +11,7 @@ import HowItWorksModal from './components/common/HowItWorksModal';
 import AISQLAssistantModal from './components/common/AISQLAssistantModal';
 import PipelineHealthPage from './pages/PipelineHealthPage';
 import { API_BASE } from './services/api';
+import { CONFIG } from './config';
 
 type DataSource = {
   source_id: string;
@@ -49,6 +50,7 @@ type UploadState = {
 };
 
 const App: React.FC = () => {
+  const isReadOnlyDemo = CONFIG.APP_MODE === 'demo';
   const [activePage, setActivePage] = useState<PageId>('pcap-upload');
   const [searchPrefill, setSearchPrefill] = useState<LogSearchPrefill>({});
   const [searchPrefillVersion, setSearchPrefillVersion] = useState(0);
@@ -208,6 +210,7 @@ const App: React.FC = () => {
       case 'pcap-upload':
         return (
           <PcapUploadPage
+            demoReadOnly={isReadOnlyDemo}
             onUploadComplete={(source) => {
               setCurrentSource(source);
               loadSources();
@@ -233,6 +236,7 @@ const App: React.FC = () => {
       default:
         return (
           <PcapUploadPage
+            demoReadOnly={isReadOnlyDemo}
             onUploadComplete={(source) => {
               setCurrentSource(source);
               loadSources();
@@ -255,9 +259,10 @@ const App: React.FC = () => {
         currentSource={currentSource}
         sources={sources}
         onSourceChange={switchSource}
-        onResetData={resetAllData}
+        onResetData={isReadOnlyDemo ? undefined : resetAllData}
         onOpenHowItWorks={() => setShowHowItWorks(true)}
         onOpenAISQLAssistant={() => setShowAISQLAssistant(true)}
+        readOnlyDemo={isReadOnlyDemo}
       />
       <Sidebar activePage={activePage} onPageChange={setActivePage} />
       <TopNav />

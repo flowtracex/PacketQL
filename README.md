@@ -62,6 +62,26 @@ Go normalization + enrichment pipeline
 
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
+## Product Screenshots
+
+### PCAP Upload
+
+Upload `.pcap` and `.pcapng` files, then move directly into investigation workflows.
+
+![PCAP Upload](docs/screenshots/pcap-upload.png)
+
+### Log Search
+
+Search normalized protocol data and pivot through investigation results.
+
+![Log Search](docs/screenshots/log-search.png)
+
+### SQL Query
+
+Run SQL against structured protocol tables and inspect results in the same workflow.
+
+![SQL Query Results](docs/screenshots/sql-query-results.png)
+
 ## Quick Start With Docker Hub
 
 After you publish the image, make this the main install path.
